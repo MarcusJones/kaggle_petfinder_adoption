@@ -52,12 +52,14 @@ default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
     'start_date': datetime(2015, 6, 1),
+    'end_data': None,
     'email': ['airflow@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'dag':DAG
+    'dag':DAG,
+
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -67,7 +69,11 @@ default_args = {
 def my_test():
     print("Test print")
 
-dag = DAG('test_flow', default_args=default_args)
+dag = DAG('test_flow',
+          catchup=False,
+          schedule_interval=None,
+          default_args=default_args
+          )
 
 start = BashOperator(task_id='start', bash_command='date', dag=dag)
 
