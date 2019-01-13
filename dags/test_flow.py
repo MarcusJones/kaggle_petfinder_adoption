@@ -66,33 +66,12 @@ default_args = {
 dag = DAG(
     'test_flow', default_args=default_args)
 
-start = BashOperator(
-    task_id='print_date',
-    bash_command='date',
-    dag=dag)
+start = BashOperator(task_id='start', bash_command='date')
 
-t2 = PythonOperator(
-    task_id='sleep',
-    python_callable=run_path(),
-    dag=dag)
+t1 = BashOperator(task_id='cd', bash_command='cd ~/kaggle/petfinder_adoption')
 
-# templated_command = """
-#     {% for i in range(5) %}
-#         echo "{{ ds }}"
-#         echo "{{ macros.ds_add(ds, 7)}}"
-#         echo "{{ params.my_param }}"
-#     {% endfor %}
-# """
-#
-# t3 = BashOperator(
-#     task_id='templated',
-#     bash_command=templated_command,
-#     params={'my_param': 'Parameter I passed in'},
-#     dag=dag)
+t2 = PythonOperator(task_id='sleep', python_callable=run_path())
 
-end = BashOperator(
-    task_id='end',
-    bash_command='echo END',
-    dag=dag)
+end = BashOperator(task_id='end', bash_command='echo END')
 
-start >> t2 >> end
+start >> t1 >> t2 >> end
