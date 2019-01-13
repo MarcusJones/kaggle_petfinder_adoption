@@ -55,23 +55,28 @@ default_args = {
     'email': ['airflow@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 0,
     'retry_delay': timedelta(minutes=5),
+    'dag':DAG
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG(
-    'test_flow', default_args=default_args)
+def my_test():
+    print("Test print")
 
-start = BashOperator(task_id='start', bash_command='date')
+dag = DAG('test_flow', default_args=default_args)
 
-t1 = BashOperator(task_id='cd', bash_command='cd ~/kaggle/petfinder_adoption')
+start = BashOperator(task_id='start', bash_command='date', dag=dag)
 
-t2 = PythonOperator(task_id='sleep', python_callable=run_path())
+t1 = BashOperator(task_id='cd', bash_command='cd ~/kaggle/petfinder_adoption', dag=dag)
 
-end = BashOperator(task_id='end', bash_command='echo END')
+# t2 = PythonOperator(task_id='sleep', python_callable=run_path(), dag=dag))
+t2 = PythonOperator(task_id='call_python', python_callable=my_test, dag=dag)
+
+end = BashOperator(task_id='end', bash_command='echo END', dag=dag)
 
 start >> t1 >> t2 >> end
+# start >> end
