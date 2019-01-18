@@ -72,7 +72,7 @@ def my_test():
 
 
 with DAG('my_dag', start_date=datetime(2016, 1, 1)) as dag:
-    op = DummyOperator('op')
+    op = DummyOperator(task_id='op')
 
 op.dag is dag # True
 
