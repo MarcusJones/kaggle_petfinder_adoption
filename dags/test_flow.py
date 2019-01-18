@@ -5,6 +5,9 @@ https://github.com/apache/incubator-airflow/blob/master/airflow/example_dags/tut
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.dummy_operator import DummyOperator
+import airflow
+print(airflow.__version__)
 from datetime import datetime, timedelta
 import os
 from runpy import run_path
@@ -58,8 +61,6 @@ default_args = {
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'dag':DAG,
-
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -69,20 +70,29 @@ default_args = {
 def my_test():
     print("Test print")
 
-dag = DAG('test_flow',
-          catchup=False,
-          schedule_interval=None,
-          default_args=default_args
-          )
 
-start = BashOperator(task_id='start', bash_command='date', dag=dag)
+with DAG('my_dag', start_date=datetime(2016, 1, 1)) as dag:
+    op = DummyOperator('op')
 
-t1 = BashOperator(task_id='cd', bash_command='cd ~/kaggle/petfinder_adoption', dag=dag)
+op.dag is dag # True
 
-# t2 = PythonOperator(task_id='sleep', python_callable=run_path(), dag=dag))
-t2 = PythonOperator(task_id='call_python', python_callable=my_test, dag=dag)
 
-end = BashOperator(task_id='end', bash_command='echo END', dag=dag)
+# dag = DAG('test_flow',
+#           catchup=False,
+#           schedule_interval=None,
+#           default_args=default_args
+#           )
+# with DAG('test_flow', catchup=False, schedule_interval=None, default_args=default_args ) as dag:
+#     # start = DummyOperator('op')
+#     op = DummyOperator('op')
 
-start >> t1 >> t2 >> end
+#     t0 = BashOperator(task_id='echo', bash_command='echo Starting this DAG')
+#
+#     t1 = BashOperator(task_id='cd', bash_command='cd ~/kaggle/petfinder_adoption', dag=dag)
+#
+#     t2 = PythonOperator(task_id='call_python', python_callable=my_test)
+#
+#     end = BashOperator(task_id='end', bash_command='echo END')
+#
+# start >> t0 >> t1 >> t2 >> end
 # start >> end
