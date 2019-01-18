@@ -14,15 +14,27 @@ sys.path.insert(0, str(SCRIPT_PATH))
 from data.data_00 import run_data_00
 from data.data_01 import run_data_01
 
-this_DAG = af.DAG('python_test',
+
+this_DAG = af.DAG('python_test_parameters',
                   schedule_interval=None,
                   start_date=datetime(2016, 1, 1))
 
 with this_DAG as dag:
     ops = list()
     ops.append(DummyOperator(task_id='Start'))
-    ops.append(PythonOperator(task_id='run_data_00', python_callable=run_data_00))
-    ops.append(PythonOperator(task_id='run_data_01', python_callable=run_data_01))
+
+
+    ops.append(PythonOperator(task_id='run_data_00',
+                              python_callable=run_data_00,
+                              provide_context=True))
+
+
+    ops.append(PythonOperator(task_id='run_data_01',
+                              python_callable=run_data_01,
+                              provide_context=False,
+                              ))
+
+
     ops.append(DummyOperator(task_id='End'))
 
 # Build the DAG from the list
