@@ -153,24 +153,32 @@ train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
 
 
 #%% CATEGORICAL: Vaccinated
-map_Vaccinated = {
+map_Vaccinated
+
+train['FurLength'] = train['FurLength'].astype('category')
+train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
+
+#%% Pipeline
+maps = dict()
+maps['Vaccinated'] = {
     1 : 'Yes',
     2 : 'No',
     3 : 'Not sure',
 }
 
-train['FurLength'] = train['FurLength'].astype('category')
-train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
-
 data_mapper = DataFrameMapper([
-    ("district", sk.preprocessing.LabelBinarizer()),
-], df_out=True)
+    ('Vaccinated', NumericalToCat(maps['Vaccinated'])),
+], input_df=True, df_out=True, default=None)
+# input_df - Ensure the passed in column enters as a series or DF
+# df_out - Ensure the pipeline returns a df
+# default - if a column is
+for step in data_mapper.features:
+    print(step)
 
-#%%
-sample = train.sample(1000).copy()
-sample.info()
-sample["AdoptionSpeed"] = sample["AdoptionSpeed"].astype('category')
-sample.info()
+#%% FIT TRANSFORM
+df_sample = train.sample(100).copy()
+df_trf = data_mapper.fit_transform(df_sample)
+
 
 
 
