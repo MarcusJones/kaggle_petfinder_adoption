@@ -63,10 +63,13 @@ logging.debug("Loaded test {}".format(df_test.shape))
 df_train['dataset_type'] = 'train'
 df_test['dataset_type'] = 'test'
 logging.debug("Added dataset_type column for origin".format())
-all_data = pd.concat([df_train, df_test], sort=False)
+df_all = pd.concat([df_train, df_test], sort=False)
 
 #%% Memory of the training DF:
-logging.debug("Size of training DF: {} MB".format(sys.getsizeof(df_train) / 1000 / 1000))
+logging.debug("Size of DF: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
+
+#%%
+df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
 
 #%% Category Mappings
 label_maps = dict()
@@ -178,9 +181,9 @@ for step in data_mapper.features:
     print(step)
 
 #%% FIT TRANSFORM
-df_train = data_mapper.fit_transform(df_train)
+df_all = data_mapper.fit_transform(df_all)
 
-logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_train)/1000/1000))
+logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
