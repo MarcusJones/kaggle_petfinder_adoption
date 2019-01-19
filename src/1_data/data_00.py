@@ -64,6 +64,9 @@ df_train['dataset_type'] = 'train'
 df_test['dataset_type'] = 'test'
 logging.debug("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)
+df_all.set_index('PetID',inplace=True)
+
+del df_train, df_test
 
 #%% Memory of the training DF:
 logging.debug("Size of DF: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
