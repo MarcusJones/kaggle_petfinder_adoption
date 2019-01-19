@@ -65,20 +65,74 @@ test['dataset_type'] = 'test'
 logging.debug("Added dataset_type column for origin".format())
 all_data = pd.concat([train, test],sort=False)
 
-#%% Type
+#%% CATEGORICAL: Type
 map_type = {1:"Dog", 2:"Cat"}
 train['Type'] = train['Type'].astype('category')
-train['Type'].cat.rename_categories(map_type)
-#%% Adoption Speed (TARGET!)
+train['Type'].cat.rename_categories(map_type, inplace=True)
 
+#%% CATEGORICAL: Adoption Speed (TARGET!)
+map_adopt_speed = {
+    0 : "same day",
+    1 : "between 1 and 7 days",
+    2 : "between 8 and 30 days",
+    3 : "between 31 and 90 days",
+    4 : "No adoption after 100 days",
+}
+train['AdoptionSpeed'] = train['AdoptionSpeed'].astype('category')
+train['AdoptionSpeed'].cat.rename_categories(map_adopt_speed,inplace=True)
+
+#%% CATEGORICAL: Breeds
+dog_breed = breeds[['BreedID','BreedName']][breeds['Type']==1].copy()
+map_dog_breed = dict(zip(dog_breed['BreedID'], dog_breed['BreedName']))
+
+cat_breed = breeds[['BreedID','BreedName']][breeds['Type']==2].copy()
+map_cat_breed = dict(zip(cat_breed['BreedID'], cat_breed['BreedName']))
+
+# Just in case, check for overlap in breeds
+# for i in range(308):
+#     print(i,end=": ")
+#     if i in map_dog_breed: print(map_dog_breed[i], end=' - ')
+#     if i in map_cat_breed: print(map_cat_breed[i], end=' - ')
+#     if i in map_dog_breed and i in map_cat_breed: raise
+#     print()
+
+map_all_breeds = dict()
+map_all_breeds.update(map_dog_breed)
+map_all_breeds.update(map_cat_breed)
+map_all_breeds[0] = "NA"
+
+train['Breed1'] = train['Breed1'].astype('category')
+train['Breed1'].cat.rename_categories(map_all_breeds,inplace=True)
+
+train['Breed2'] = train['Breed2'].astype('category')
+train['Breed2'].cat.rename_categories(map_all_breeds,inplace=True)
+
+#%% CATEGORICAL: Gender
+map_gender = {
+    1 : 'Male',
+    2 : 'Female',
+    3 : 'Group',
+}
+
+train['Gender'] = train['Gender'].astype('category')
+train['Gender'].cat.rename_categories(map_gender,inplace=True)
+#%% CATEGORICAL: Color
+map_colors = dict(zip(colors['ColorID'], colors['ColorName']))
+map_colors[0] = "NA"
+train['Color1'] = train['Color1'].astype('category')
+train['Color1'].cat.rename_categories(map_colors,inplace=True)
+
+train['Color2'] = train['Color2'].astype('category')
+train['Color2'].cat.rename_categories(map_colors,inplace=True)
+
+train['Color3'] = train['Color3'].astype('category')
+train['Color3'].cat.rename_categories(map_colors,inplace=True)
+#%%
 sample = train.sample(1000).copy()
 sample.info()
-sample["Type"] = sample["Type"].astype('category')
+sample["AdoptionSpeed"] = sample["AdoptionSpeed"].astype('category')
 sample.info()
 
-r = sample.Type.cat.categories
-
-sample.Type.cat.rename_categories(map_type)
 
 
 #%% DONE HERE - DELETE UNUSED
