@@ -11,8 +11,8 @@ import sys
 sys.path.insert(0, str(SCRIPT_PATH))
 
 # Import the script modules
-from data.data_00 import run_data_00
-from data.data_01 import run_data_01
+from test_dags.test_dag import run_data_00
+from test_dags.test_dag import run_data_01
 
 
 this_DAG = af.DAG('python_test_parameters',
