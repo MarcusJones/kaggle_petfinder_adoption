@@ -65,23 +65,31 @@ test['dataset_type'] = 'test'
 logging.debug("Added dataset_type column for origin".format())
 all_data = pd.concat([train, test],sort=False)
 
-#%% CATEGORICAL: Type
-map_type = {1:"Dog", 2:"Cat"}
-train['Type'] = train['Type'].astype('category')
-train['Type'].cat.rename_categories(map_type, inplace=True)
-
-#%% CATEGORICAL: Adoption Speed (TARGET!)
-map_adopt_speed = {
+#%% Mapping types
+label_maps = dict()
+label_maps['Vaccinated'] = {
+    1 : 'Yes',
+    2 : 'No',
+    3 : 'Not sure',
+}
+label_maps['Type'] = {
+    1:"Dog",
+    2:"Cat"
+}
+label_maps['AdoptionSpeed'] = {
     0 : "same day",
     1 : "between 1 and 7 days",
     2 : "between 8 and 30 days",
     3 : "between 31 and 90 days",
     4 : "No adoption after 100 days",
 }
-train['AdoptionSpeed'] = train['AdoptionSpeed'].astype('category')
-train['AdoptionSpeed'].cat.rename_categories(map_adopt_speed,inplace=True)
+label_maps['Gender'] = {
+    1 : 'Male',
+    2 : 'Female',
+    3 : 'Group',
+}
 
-#%% CATEGORICAL: Breeds
+# For the breeds, load the two types seperate
 dog_breed = breeds[['BreedID','BreedName']][breeds['Type']==1].copy()
 map_dog_breed = dict(zip(dog_breed['BreedID'], dog_breed['BreedName']))
 
@@ -96,10 +104,35 @@ map_cat_breed = dict(zip(cat_breed['BreedID'], cat_breed['BreedName']))
 #     if i in map_dog_breed and i in map_cat_breed: raise
 #     print()
 
+# It's fine, join them into one dict
 map_all_breeds = dict()
 map_all_breeds.update(map_dog_breed)
 map_all_breeds.update(map_cat_breed)
 map_all_breeds[0] = "NA"
+
+# Now add them to the master label dictionary for each column
+label_maps['Breed1'] = label_maps
+label_maps['Breed2'] = label_maps
+
+# Similarly, load the color map
+map_colors = dict(zip(colors['ColorID'], colors['ColorName']))
+map_colors[0] = "NA"
+label_maps['Color1'] = map_colors
+label_maps['Color2'] = map_colors
+label_maps['Color3'] = map_colors
+
+
+#%% CATEGORICAL: Type
+train['Type'] = train['Type'].astype('category')
+train['Type'].cat.rename_categories(map_type, inplace=True)
+
+#%% CATEGORICAL: Adoption Speed (TARGET!)
+
+train['AdoptionSpeed'] = train['AdoptionSpeed'].astype('category')
+train['AdoptionSpeed'].cat.rename_categories(map_adopt_speed,inplace=True)
+
+#%% CATEGORICAL: Breeds
+
 
 train['Breed1'] = train['Breed1'].astype('category')
 train['Breed1'].cat.rename_categories(map_all_breeds,inplace=True)
@@ -108,25 +141,11 @@ train['Breed2'] = train['Breed2'].astype('category')
 train['Breed2'].cat.rename_categories(map_all_breeds,inplace=True)
 
 #%% CATEGORICAL: Gender
-map_gender = {
-    1 : 'Male',
-    2 : 'Female',
-    3 : 'Group',
-}
+
 
 train['Gender'] = train['Gender'].astype('category')
 train['Gender'].cat.rename_categories(map_gender,inplace=True)
-#%% CATEGORICAL: Color
-map_colors = dict(zip(colors['ColorID'], colors['ColorName']))
-map_colors[0] = "NA"
-train['Color1'] = train['Color1'].astype('category')
-train['Color1'].cat.rename_categories(map_colors,inplace=True)
 
-train['Color2'] = train['Color2'].astype('category')
-train['Color2'].cat.rename_categories(map_colors,inplace=True)
-
-train['Color3'] = train['Color3'].astype('category')
-train['Color3'].cat.rename_categories(map_colors,inplace=True)
 
 #%% CATEGORICAL: MaturitySize
 map_maturity_size = {
@@ -151,27 +170,15 @@ train['FurLength'] = train['FurLength'].astype('category')
 train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
 
 
-
-#%% CATEGORICAL: Vaccinated
-map_Vaccinated
-
-train['FurLength'] = train['FurLength'].astype('category')
-train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
-
 #%% Pipeline
-maps = dict()
-maps['Vaccinated'] = {
-    1 : 'Yes',
-    2 : 'No',
-    3 : 'Not sure',
-}
 
 data_mapper = DataFrameMapper([
-    ('Vaccinated', NumericalToCat(maps['Vaccinated'])),
+    ('Vaccinated', NumericalToCat(label_maps),
 ], input_df=True, df_out=True, default=None)
 # input_df - Ensure the passed in column enters as a series or DF
 # df_out - Ensure the pipeline returns a df
-# default - if a column is
+# default - if a column is not transformed, keep it unchanged!
+
 for step in data_mapper.features:
     print(step)
 

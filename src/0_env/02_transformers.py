@@ -56,18 +56,17 @@ class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, Transforme
     """Convert numeric indexed column into dtype category with labels
     Convert a column which has a category, presented as an Integer
     """
-
-    def __init__(self,label_map):
-        self.label_map = label_map
+    def __init__(self,label_map_dict):
+        self.label_map_dict = label_map_dict
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, series):
-        print(type(series))
-
-        # print(df.info())
-        # print(df.columns)
+        assert type(series) == pd.Series
+        assert series.Name in self.label_map_dict, "{} not in label map!".format(series.Name)
+        series = series.astype('category')
+        series.cat.rename_categories(self.label_map_dict, inplace=True)
         print(self.log)
         return series
 
