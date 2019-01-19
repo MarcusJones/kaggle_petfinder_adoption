@@ -9,6 +9,18 @@ verify_ssl = true
 sklearn = "*"
 pandas = "*"
 jupytext = "*"
+seaborn = "*"
+lightgbm = "*"
+xgboost = "*"
+pillow = "*"
+wordcloud = "*"
+catboost = "*"
+tqdm = "*"
+plotly = "*"
+nltk = "*"
+langdetect = "*"
+eli5 = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.6"

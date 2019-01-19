@@ -57,7 +57,7 @@ import gc
 from catboost import CatBoostClassifier
 from tqdm import tqdm_notebook
 import plotly.offline as py
-py.init_notebook_mode(connected=True)
+# py.init_notebook_mode(connected=True)
 import plotly.graph_objs as go
 import plotly.tools as tls
 import random
@@ -78,7 +78,7 @@ from nltk.tokenize import TweetTokenizer
 from sklearn.ensemble import RandomForestClassifier
 import langdetect
 import eli5
-from IPython.display import display 
+# from IPython.display import display
 
 from sklearn.metrics import cohen_kappa_score
 def kappa(y_true, y_pred):
