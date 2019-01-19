@@ -127,6 +127,45 @@ train['Color2'].cat.rename_categories(map_colors,inplace=True)
 
 train['Color3'] = train['Color3'].astype('category')
 train['Color3'].cat.rename_categories(map_colors,inplace=True)
+
+#%% CATEGORICAL: MaturitySize
+map_maturity_size = {
+    1 : 'Small',
+    2 : 'Medium',
+    3 : 'Large',
+    4 : 'Extra Large',
+    0 : 'Not Specified',
+}
+train['MaturitySize'] = train['MaturitySize'].astype('category')
+train['MaturitySize'].cat.rename_categories(map_maturity_size,inplace=True)
+
+#%% CATEGORICAL: FurLength
+map_FurLength = {
+    1 : 'Short',
+    2 : 'Medium',
+    3 : 'Long',
+    0 : 'Not Specified',
+}
+
+train['FurLength'] = train['FurLength'].astype('category')
+train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
+
+
+
+#%% CATEGORICAL: Vaccinated
+map_Vaccinated = {
+    1 : 'Yes',
+    2 : 'No',
+    3 : 'Not sure',
+}
+
+train['FurLength'] = train['FurLength'].astype('category')
+train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
+
+data_mapper = DataFrameMapper([
+    ("district", sk.preprocessing.LabelBinarizer()),
+], df_out=True)
+
 #%%
 sample = train.sample(1000).copy()
 sample.info()

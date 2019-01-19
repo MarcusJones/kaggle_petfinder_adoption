@@ -1,5 +1,31 @@
+class TransformerLog():
+    """Add a .log attribute for logging
+    """
+    @property
+    def log(self):
+        return "Transformer: {}".format(type(self).__name__)
 
-# %%
+
+class Imputer1D(sk.preprocessing.Imputer):
+    """
+    A simple wrapper class on Imputer to avoid having to make a single column 2D.
+    """
+
+    def fit(self, X, y=None):
+        if X.ndim == 1:
+            X = np.expand_dims(X, axis=1)
+        # Call the Imputer as normal, return result
+        return super(Imputer1D, self).fit(X, y=None)
+
+    def transform(self, X, y=None):
+        if X.ndim == 1:
+            X = np.expand_dims(X, axis=1)
+            # Call the Imputer as normal, return result
+        return super(Imputer1D, self).transform(X)
+
+
+
+    # %%
 def strfdelta(tdelta, fmt):
     d = {"days": tdelta.days}
     d["hours"], rem = divmod(tdelta.seconds, 3600)
@@ -8,43 +34,43 @@ def strfdelta(tdelta, fmt):
 
 
 # %%
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
-
-    print(cm)
-
-    fig, ax = plt.subplots(figsize=LANDSCAPE_A4)  # Sample figsize in inches
-
-    plt.style.use('ggplot')
-
-    # sns.heatmap(addr_cross_cat, linewidths=.5,cmap='jet');
-    # sns.heatmap(addr_cross_cat, linewidths=.5,cmap = cmap,ax=ax)
-    # plt.tight_layout(pad=5)
-    # plt.suptitle(title_str,fontname = 'Arial', fontsize=16)
-    # plt.title("{} to {}, {} records".format(min_time,max_time,num_recs))
-
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-    # plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.tight_layout(pad=5)
-
+# def plot_confusion_matrix(cm, classes,
+#                           normalize=False,
+#                           title='Confusion matrix',
+#                           cmap=plt.cm.Blues):
+#     """
+#     This function prints and plots the confusion matrix.
+#     Normalization can be applied by setting `normalize=True`.
+#     """
+#     if normalize:
+#         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+#         print("Normalized confusion matrix")
+#     else:
+#         print('Confusion matrix, without normalization')
+#
+#     print(cm)
+#
+#     fig, ax = plt.subplots(figsize=LANDSCAPE_A4)  # Sample figsize in inches
+#
+#     plt.style.use('ggplot')
+#
+#     # sns.heatmap(addr_cross_cat, linewidths=.5,cmap='jet');
+#     # sns.heatmap(addr_cross_cat, linewidths=.5,cmap = cmap,ax=ax)
+#     # plt.tight_layout(pad=5)
+#     # plt.suptitle(title_str,fontname = 'Arial', fontsize=16)
+#     # plt.title("{} to {}, {} records".format(min_time,max_time,num_recs))
+#
+#     plt.imshow(cm, interpolation='nearest', cmap=cmap)
+#     plt.title(title)
+#     plt.colorbar()
+#     tick_marks = np.arange(len(classes))
+#     plt.xticks(tick_marks, classes, rotation=45)
+#     plt.yticks(tick_marks, classes)
+#     # plt.tight_layout()
+#     plt.ylabel('True label')
+#     plt.xlabel('Predicted label')
+#     plt.tight_layout(pad=5)
+#
 
 #    fmt = '.2f' if normalize else 'd'
 #    thresh = cm.max() / 2.

@@ -21,6 +21,7 @@ nltk = "*"
 langdetect = "*"
 eli5 = "*"
 ipython = "*"
+sklearn-pandas = "*"
 
 [requires]
 python_version = "3.6"
