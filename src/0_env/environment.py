@@ -5,7 +5,7 @@ Created on Sun Jun 10 10:32:09 2018
 
 @author: batman
 """
-
+import pandas as pd
 # %% Globals
 
 LANDSCAPE_A3 = (16.53, 11.69)

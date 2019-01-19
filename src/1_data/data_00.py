@@ -3,8 +3,9 @@
 # =============================================================================
 import os
 import yaml
+from pathlib import Path
 import sys
-
+import zipfile
 from datetime import datetime
 
 #%%
@@ -20,7 +21,7 @@ logger.setLevel(logging.DEBUG)
 #FORMAT = "%(asctime)s - %(levelno)-3s - %(module)-10s  %(funcName)-10s: %(message)s"
 #FORMAT = "%(asctime)s - %(levelno)-3s - %(funcName)-10s: %(message)s"
 #FORMAT = "%(asctime)s - %(funcName)-10s: %(message)s"
-FORMAT = "%(asctime)s : %(message)s"
+FORMAT = "%(asctime)s : %(mezssage)s"
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
 #DATE_FMT = "%H:%M:%S"
 formatter = logging.Formatter(FORMAT, DATE_FMT)
@@ -32,16 +33,22 @@ logger.handlers = [handler]
 logging.debug("Logging started")
 
 #%% ===========================================================================
-#  Data source and paths
+# Data source and paths
 # =============================================================================
-path_data = os.path.join(PATH_DATA_ROOT, r"")
-assert os.path.exists(path_data), path_data
+path_data = Path(PATH_DATA_ROOT, r"").expanduser()
+assert path_data.exists()
 logging.info("Data path {}".format(PATH_DATA_ROOT))
 
-#%% SFPD DATA
-logging.info(f"Load SFPD")
-sfpd_all = pd.read_csv(os.path.join(path_data, "rows.csv.gz"),delimiter=',',compression='gzip')
-logging.info("Loaded SFPD data, {} rows".format(len(sfpd_all)))
+#%% ===========================================================================
+# Load data
+# =============================================================================
+logging.info(f"Load")
+with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
+    tr_ = pd.read_csv(f,delimiter=',')
+with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
+    te_ = pd.read_csv(f,delimiter=',')
+# te_ = pd.read_csv(os.path.join(path_data, "test.zip"),delimiter=',',compression='zip')
+# logging.info("Loaded SFPD data, {} rows".format(len(sfpd_all)))
 #sfpd_head = sfpd_all.head()
 
 #%% Create DateTime column on sfpd_all
