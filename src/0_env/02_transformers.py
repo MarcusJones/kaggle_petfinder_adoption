@@ -5,6 +5,25 @@ import time
 import numpy as np
 from sklearn_pandas import DataFrameMapper
 
+
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+#        if 'log_time' in kw:
+#            name = kw.get('log_name', method.__name__.upper())
+#            kw['log_time'][name] = int((te - ts) * 1000)
+        if 0:
+            pass
+        else:
+            pass
+#            print('Elapsed', (te - ts) * 1000)
+            #print '%r  %2.2f ms' % \
+            #      (method.__name__, (te - ts) * 1000)
+        return result
+    return timed
+
 class TransformerLog():
     """Add a .log attribute for logging
     """
@@ -55,6 +74,8 @@ class Empty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
 class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
     """Convert numeric indexed column into dtype category with labels
     Convert a column which has a category, presented as an Integer
+    Initialize with a dict of ALL mappings for this session, keyed by column name
+    (This could be easily refactored to have only the required mapping)
     """
     def __init__(self,label_map_dict):
         self.label_map_dict = label_map_dict
@@ -64,11 +85,15 @@ class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, Transforme
 
     def transform(self, series):
         assert type(series) == pd.Series
-        assert series.Name in self.label_map_dict, "{} not in label map!".format(series.Name)
+        assert series.name in self.label_map_dict, "{} not in label map!".format(series.Name)
         series = series.astype('category')
-        series.cat.rename_categories(self.label_map_dict, inplace=True)
-        print(self.log)
+        series.cat.rename_categories(self.label_map_dict[series.name], inplace=True)
+        print(self.log, series.cat.categories)
         return series
+
+# r  = df_trf.Vaccinated
+# r = r.astype('category')
+# r.cat.rename_categories(label_maps['Vaccinated'],inplace=True)
 
 # train['FurLength'] = train['FurLength'].astype('category')
 # train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)

@@ -46,26 +46,29 @@ logging.info(f"Load")
 
 # def load_zip
 with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
-    train = pd.read_csv(f,delimiter=',')
+    df_train = pd.read_csv(f, delimiter=',')
 with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
-    test = pd.read_csv(f,delimiter=',')
+    df_test = pd.read_csv(f, delimiter=',')
 with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
-    test = pd.read_csv(f,delimiter=',')
+    df_sample_submission = pd.read_csv(f, delimiter=',')
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")
 colors = pd.read_csv(path_data / "color_labels.csv")
 states = pd.read_csv(path_data / "state_labels.csv")
 
-logging.debug("Loaded train {}".format(train.shape))
-logging.debug("Loaded test {}".format(test.shape))
+logging.debug("Loaded train {}".format(df_train.shape))
+logging.debug("Loaded test {}".format(df_test.shape))
 
 # Add a column to label the source of the data
-train['dataset_type'] = 'train'
-test['dataset_type'] = 'test'
+df_train['dataset_type'] = 'train'
+df_test['dataset_type'] = 'test'
 logging.debug("Added dataset_type column for origin".format())
-all_data = pd.concat([train, test],sort=False)
+all_data = pd.concat([df_train, df_test], sort=False)
 
-#%% Mapping types
+#%% Memory of the training DF:
+logging.debug("Size of training DF: {} MB".format(sys.getsizeof(df_train) / 1000 / 1000))
+
+#%% Category Mappings
 label_maps = dict()
 label_maps['Vaccinated'] = {
     1 : 'Yes',
@@ -87,6 +90,35 @@ label_maps['Gender'] = {
     1 : 'Male',
     2 : 'Female',
     3 : 'Group',
+}
+label_maps['MaturitySize'] = {
+    1 : 'Small',
+    2 : 'Medium',
+    3 : 'Large',
+    4 : 'Extra Large',
+    0 : 'Not Specified',
+}
+label_maps['FurLength'] = {
+    1 : 'Short',
+    2 : 'Medium',
+    3 : 'Long',
+    0 : 'Not Specified',
+}
+label_maps['Dewormed'] = {
+    1 : 'Yes',
+    2 : 'No',
+    3 : 'Not sure',
+}
+label_maps['Sterilized'] = {
+    1 : 'Yes',
+    2 : 'No',
+    3 : 'Not sure',
+}
+label_maps['Health'] = {
+    1 : 'Healthy',
+    2 : 'Minor Injury',
+    3 : 'Serious Injury',
+    0 : 'Not Specified',
 }
 
 # For the breeds, load the two types seperate
@@ -111,8 +143,8 @@ map_all_breeds.update(map_cat_breed)
 map_all_breeds[0] = "NA"
 
 # Now add them to the master label dictionary for each column
-label_maps['Breed1'] = label_maps
-label_maps['Breed2'] = label_maps
+label_maps['Breed1'] = map_all_breeds
+label_maps['Breed2'] = map_all_breeds
 
 # Similarly, load the color map
 map_colors = dict(zip(colors['ColorID'], colors['ColorName']))
@@ -121,85 +153,50 @@ label_maps['Color1'] = map_colors
 label_maps['Color2'] = map_colors
 label_maps['Color3'] = map_colors
 
+# And the states map
+label_maps['State'] = dict(zip(states['StateID'], states['StateName']))
 
-#%% CATEGORICAL: Type
-train['Type'] = train['Type'].astype('category')
-train['Type'].cat.rename_categories(map_type, inplace=True)
+logging.debug("Category mappings for {} columns created".format(len(label_maps)))
 
-#%% CATEGORICAL: Adoption Speed (TARGET!)
+for map in label_maps:
+    print(map, label_maps[map])
 
-train['AdoptionSpeed'] = train['AdoptionSpeed'].astype('category')
-train['AdoptionSpeed'].cat.rename_categories(map_adopt_speed,inplace=True)
-
-#%% CATEGORICAL: Breeds
-
-
-train['Breed1'] = train['Breed1'].astype('category')
-train['Breed1'].cat.rename_categories(map_all_breeds,inplace=True)
-
-train['Breed2'] = train['Breed2'].astype('category')
-train['Breed2'].cat.rename_categories(map_all_breeds,inplace=True)
-
-#%% CATEGORICAL: Gender
-
-
-train['Gender'] = train['Gender'].astype('category')
-train['Gender'].cat.rename_categories(map_gender,inplace=True)
-
-
-#%% CATEGORICAL: MaturitySize
-map_maturity_size = {
-    1 : 'Small',
-    2 : 'Medium',
-    3 : 'Large',
-    4 : 'Extra Large',
-    0 : 'Not Specified',
-}
-train['MaturitySize'] = train['MaturitySize'].astype('category')
-train['MaturitySize'].cat.rename_categories(map_maturity_size,inplace=True)
-
-#%% CATEGORICAL: FurLength
-map_FurLength = {
-    1 : 'Short',
-    2 : 'Medium',
-    3 : 'Long',
-    0 : 'Not Specified',
-}
-
-train['FurLength'] = train['FurLength'].astype('category')
-train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
-
+#%% Dynamically create the transformation definitions
+tx_definitions = [(col_name, NumericalToCat(label_maps)) for col_name in label_maps]
 
 #%% Pipeline
-
-data_mapper = DataFrameMapper([
-    ('Vaccinated', NumericalToCat(label_maps),
-], input_df=True, df_out=True, default=None)
+# Build the pipeline
+# NOTES:
 # input_df - Ensure the passed in column enters as a series or DF
 # df_out - Ensure the pipeline returns a df
 # default - if a column is not transformed, keep it unchanged!
+data_mapper = DataFrameMapper(
+    tx_definitions,
+input_df=True, df_out=True, default=None)
 
 for step in data_mapper.features:
     print(step)
 
 #%% FIT TRANSFORM
-df_sample = train.sample(100).copy()
-df_trf = data_mapper.fit_transform(df_sample)
+df_train = data_mapper.fit_transform(df_train)
 
-
-
+logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_train)/1000/1000))
 
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 
 del_vars =[
-        # "train",
-        # "sfpd_head",
-        # "sfpd_kag_all",
-        # "sfpd_kag_head",
-        # "df_summary",
-        # "util_path",
-        ]
+    'breeds',
+    'cat_breed',
+    'colors',
+    'data_mapper',
+    'dog_breed',
+    'map_colors',
+    'map_all_breeds',
+    'map_cat_breed',
+    'map_dog_breed',
+    'states',
+]
 cnt = 0
 for name in dir():
     if name in del_vars:
