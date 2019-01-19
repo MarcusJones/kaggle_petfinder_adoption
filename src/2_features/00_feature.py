@@ -19,6 +19,8 @@ def pure_breed(row):
 
 # sample = df_all.iloc[0:10][['Breed1','Breed2']]
 df_all['Pure Breed'] = df_all.apply(pure_breed,axis=1)
+df_all['Pure Breed'] = df_all['Pure Breed'].astype('category')
 df_all.columns
+df_all.info()
 # For inspection:
 # df_breeds = df_all[['Breed1','Breed2','Pure Breed']]

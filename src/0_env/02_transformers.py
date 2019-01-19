@@ -83,13 +83,16 @@ class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, Transforme
     def fit(self, X, y=None):
         return self
 
-    def transform(self, series):
-        assert type(series) == pd.Series
-        assert series.name in self.label_map_dict, "{} not in label map!".format(series.Name)
-        series = series.astype('category')
-        series.cat.rename_categories(self.label_map_dict[series.name], inplace=True)
-        print(self.log, series.cat.categories)
-        return series
+    def transform(self, this_series):
+        assert type(this_series) == pd.Series
+        assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.Name)
+        return_series = this_series.copy()
+        return_series = return_series.astype('category')
+        return_series.cat.rename_categories(self.label_map_dict[return_series.name], inplace=True)
+        print(self.log, return_series.cat.categories)
+
+        assert return_series.dtype == 'category'
+        return return_series
 
 # r  = df_trf.Vaccinated
 # r = r.astype('category')

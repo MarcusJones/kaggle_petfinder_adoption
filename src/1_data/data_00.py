@@ -187,7 +187,19 @@ for step in data_mapper.features:
 df_all = data_mapper.fit_transform(df_all)
 
 logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+#%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
+for col in label_maps:
+    print(col)
+    df_all[col] = df_all[col].astype('category')
+logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
+#%%
+
+# df_all['Health'] = df_all['Health'].astype(;)
+# r =
+# r
+# r = r.astype('category')
+# r
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 
@@ -210,7 +222,3 @@ for name in dir():
         del globals()[name]
 logging.info(f"Removed {cnt} variables from memory")
 del cnt, name, del_vars
-
-
-
-

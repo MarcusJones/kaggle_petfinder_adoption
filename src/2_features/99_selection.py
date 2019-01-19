@@ -10,4 +10,4 @@ cols_to_discard = [
 ]
 df_all_final = df_all[[col for col in df_all.columns if col not in cols_to_discard]]
 
-
+df_all_final
