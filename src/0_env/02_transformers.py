@@ -1,29 +1,28 @@
 import sklearn as sk
-import sklearn.preprocessing
 import pandas as pd
 import time
 import numpy as np
-from sklearn_pandas import DataFrameMapper
 
-
+#%%
 def timeit(method):
+    """ Decorator to time execution of transformers
+    :param method:
+    :return:
+    """
     def timed(*args, **kw):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-#        if 'log_time' in kw:
-#            name = kw.get('log_name', method.__name__.upper())
-#            kw['log_time'][name] = int((te - ts) * 1000)
-        if 0:
-            pass
+        if 'log_time' in kw:
+            name = kw.get('log_name', method.__name__.upper())
+            kw['log_time'][name] = int((te - ts) * 1000)
         else:
-            pass
-#            print('Elapsed', (te - ts) * 1000)
-            #print '%r  %2.2f ms' % \
-            #      (method.__name__, (te - ts) * 1000)
+            print("\t {} {:2.1f}s".format(method.__name__, (te - ts)))
         return result
     return timed
 
+
+#%%
 class TransformerLog():
     """Add a .log attribute for logging
     """
@@ -31,24 +30,7 @@ class TransformerLog():
     def log(self):
         return "Transformer: {}".format(type(self).__name__)
 
-# %%==============================================================================
-# Empty
-# ===============================================================================
-class Imputer1D(sk.preprocessing.Imputer):
-    """
-    A simple wrapper class on Imputer to avoid having to make a single column 2D.
-    """
-    def fit(self, X, y=None):
-        if X.ndim == 1:
-            X = np.expand_dims(X, axis=1)
-        # Call the Imputer as normal, return result
-        return super(Imputer1D, self).fit(X, y=None)
 
-    def transform(self, X, y=None):
-        if X.ndim == 1:
-            X = np.expand_dims(X, axis=1)
-            # Call the Imputer as normal, return result
-        return super(Imputer1D, self).transform(X)
 
 # %%==============================================================================
 # Empty
@@ -67,9 +49,27 @@ class Empty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
         print(self.log)
         return df
 
+# %%==============================================================================
+# Imputer1D - Simple Imputer wrapper
+# ===============================================================================
+class Imputer1D(sk.preprocessing.Imputer):
+    """
+    A simple wrapper class on Imputer to avoid having to make a single column 2D.
+    """
+    def fit(self, X, y=None):
+        if X.ndim == 1:
+            X = np.expand_dims(X, axis=1)
+        # Call the Imputer as normal, return result
+        return super(Imputer1D, self).fit(X, y=None)
+
+    def transform(self, X, y=None):
+        if X.ndim == 1:
+            X = np.expand_dims(X, axis=1)
+            # Call the Imputer as normal, return result
+        return super(Imputer1D, self).transform(X)
 
 # %%==============================================================================
-# NumericalToCat
+# NumericalToCat - DataFrameMapper only!
 # ===============================================================================
 class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
     """Convert numeric indexed column into dtype category with labels
@@ -105,7 +105,7 @@ class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, Transforme
 # WordCounter
 # ===============================================================================
 class WordCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
+    """ Count the words in the input column
     """
     def __init__(self, col_name, new_col_name):
         self.col_name = col_name
@@ -122,12 +122,39 @@ class WordCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLo
 
 
 #%% =============================================================================
+# ConvertToDatetime
+# ===============================================================================
+class ConvertToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
+    """
+    """
+
+    def __init__(self, time_col_name, unit='s'):
+        self.time_col_name = time_col_name
+        self.unit = unit
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, df, y=None):
+        df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], unit=self.unit)
+        print("Transformer:", type(self).__name__, "converted", self.time_col_name, "to dt")
+        return df
+
+
+
+#%% =============================================================================
 # TimeProperty
 # ===============================================================================
 class TimeProperty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
     """
     """
     def __init__(self, time_col_name, new_col_name, time_property):
+        """
+
+        :param time_col_name: Source column, MUST BE A datetime TYPE!
+        :param new_col_name: New column name
+        :param time_property: hour, month, dayofweek
+        """
         self.time_col_name = time_col_name
         self.new_col_name = new_col_name
         self.time_property = time_property
@@ -161,11 +188,22 @@ class TimeProperty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerL
 # res=time_adder.transform(df)
 #
 
+
+
+
+
+
+
+
+
+
+
+
 #%% =============================================================================
-# AnswerDelay
+# DEPRECIATED - AnswerDelay
 # ===============================================================================
 class AnswerDelay(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
+    """ Used once, not general, gets time elapsed
     """
 
     def __init__(self, new_col_name, divisor=1):
@@ -193,7 +231,7 @@ class AnswerDelay(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLo
 # ValueCounter
 # ===============================================================================
 class ValueCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
+    """??
     """
 
     def __init__(self, col_name):
@@ -212,28 +250,8 @@ class ValueCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerL
         return pd.merge(selected_df_col, df, on=self.col_name)
 
 
-# ===============================================================================
-# ConvertToDatetime
-# ===============================================================================
-class ConvertToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
-    """
-
-    def __init__(self, time_col_name, unit='s'):
-        self.time_col_name = time_col_name
-        self.unit = unit
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df, y=None):
-        df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], unit=self.unit)
-        print("Transformer:", type(self).__name__, "converted", self.time_col_name, "to dt")
-        return df
-
-
 # %%=============================================================================
-# ConvertDoubleColToDatetime
+# DEPRECIATED ConvertDoubleColToDatetime
 # ===============================================================================
 class ConvertDoubleColToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
     """

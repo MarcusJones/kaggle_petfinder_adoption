@@ -183,8 +183,9 @@ data_mapper = DataFrameMapper(
     tx_definitions,
 input_df=True, df_out=True, default=None)
 
-for step in data_mapper.features:
-    print(step)
+print("DataFrameMapper, applies transforms directly selected columns")
+for i, step in enumerate(data_mapper.features):
+    print(i, step)
 
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
