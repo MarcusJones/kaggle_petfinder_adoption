@@ -135,7 +135,7 @@ for map in label_maps:
     print(map, label_maps[map])
 
 #%% Dynamically create the transformation definitions
-tx_definitions = [(col_name, NumericalToCat(label_maps)) for col_name in label_maps]
+tx_definitions = [(col_name, trf.NumericalToCat(label_maps)) for col_name in label_maps]
 
 #%% Pipeline
 # Build the pipeline

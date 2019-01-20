@@ -21,14 +21,18 @@ def pure_breed(row):
 
 #%% Build the pipeline
 this_pipeline = sk.pipeline.Pipeline([
-        ('counr', MultipleToNewFeature(['Breed1','Breed2'], 'Pure Breed', pure_breed)),
+        ('counr', trf.MultipleToNewFeature(['Breed1','Breed2'], 'Pure Breed', pure_breed)),
         ])
+
 logging.info("Created pipeline:")
 for i, step in enumerate(this_pipeline.steps):
     print(i, step[0], step[1].__str__())
 
 #%% Fit Transform
+original_cols = df_all.columns
 df_all = this_pipeline.fit_transform(df_all)
+logging.debug("Pipeline complete. {} new columns.".format(len(df_all.columns) - len(original_cols)))
+
 
 #%%
 

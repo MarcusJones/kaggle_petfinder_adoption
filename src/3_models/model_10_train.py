@@ -1,18 +1,7 @@
 # Train 2 seperate models, one for cats, one for dogs!!
-from sklearn.model_selection import StratifiedKFold
-
-import lightgbm as lgb
-import xgboost as xgb
-from catboost import CatBoostClassifier
-import gc
-from sklearn.metrics import cohen_kappa_score
-def kappa(y_true, y_pred):
-    return cohen_kappa_score(y_true, y_pred, weights='quadratic')
-import matplotlib.pyplot as plt
-import seaborn as sns
 #%%
 n_fold = 5
-folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
+folds = sk.model_selection.StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
 
 #%%
 
@@ -123,16 +112,7 @@ def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance
         result_dict['oof'] = oof
 
     return result_dict
-
-cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
-                by="importance", ascending=False)[:50].index
-
-best_features = result_dict_lgb['feature_importance'].loc[result_dict_lgb['feature_importance'].feature.isin(cols)]
-
-p = plt.figure(figsize=(16, 12))
-sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
-plt.title('LGB Features (avg over folds)')
-plt.show()
+#
 
 #%%
 params = {'num_leaves': 128,
@@ -168,5 +148,15 @@ result_dict_lgb = train_model(X=X_tr,
                               make_oof=True)
 
 
-#%%
+#%% RESULTS
 r = result_dict_lgb['feature_importance']
+
+# cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
+#                 by="importance", ascending=False)[:50].index
+#
+# best_features = result_dict_lgb['feature_importance'].loc[result_dict_lgb['feature_importance'].feature.isin(cols)]
+#
+# p = plt.figure(figsize=(16, 12))
+# sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
+# plt.title('LGB Features (avg over folds)')
+# plt.show()
