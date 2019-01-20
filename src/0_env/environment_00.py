@@ -5,7 +5,13 @@ Created on Sun Jun 10 10:32:09 2018
 
 @author: m.jones
 """
+
+#%%
+#!pip install git+https://github.com/MarcusJones/kaggle_utils.git
+
+#%%
 import os
+from pathlib import Path
 # %% Globals
 #
 # LANDSCAPE_A3 = (16.53, 11.69)
@@ -17,7 +23,7 @@ else:
     DEPLOYMENT = 'Local'
 
 if DEPLOYMENT=='Kaggle':
-    PATH_DATA_ROOT = r"~"
+    PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
