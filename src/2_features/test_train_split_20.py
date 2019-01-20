@@ -1,6 +1,5 @@
 df_all_sample = df_all_final.sample(frac=0.3)
 
-
 df_tr = df_all_sample[df_all_sample['dataset_type']=='train'].copy()
 df_tr.drop('dataset_type',axis=1,inplace=True)
 df_te = df_all_sample[df_all_sample['dataset_type']=='test'].copy()
