@@ -5,7 +5,11 @@ import lightgbm as lgb
 import xgboost as xgb
 from catboost import CatBoostClassifier
 import gc
-
+from sklearn.metrics import cohen_kappa_score
+def kappa(y_true, y_pred):
+    return cohen_kappa_score(y_true, y_pred, weights='quadratic')
+import matplotlib.pyplot as plt
+import seaborn as sns
 #%%
 n_fold = 5
 folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
@@ -14,8 +18,6 @@ folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
 
 def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance=False,
                 averaging='usual', make_oof=False):
-
-
 
     logging.debug("Starting training {}".format(model_type))
     result_dict = {}
@@ -122,6 +124,16 @@ def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance
 
     return result_dict
 
+cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
+                by="importance", ascending=False)[:50].index
+
+best_features = result_dict_lgb['feature_importance'].loc[result_dict_lgb['feature_importance'].feature.isin(cols)]
+
+p = plt.figure(figsize=(16, 12))
+sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
+plt.title('LGB Features (avg over folds)')
+plt.show()
+
 #%%
 params = {'num_leaves': 128,
         #  'min_data_in_leaf': 60,
@@ -140,9 +152,15 @@ params = {'num_leaves': 128,
          "num_class": 5}
 
 #%%
+
+# X_tr.info()
+# y_tr.astype('int')
+# y_tr.dtype
+# y_factors = y_tr.factorize()[0]
+y_integers = y_tr.cat.codes
 result_dict_lgb = train_model(X=X_tr,
                               X_test=X_te,
-                              y=y_tr,
+                              y=y_integers,
                               params=params,
                               folds=folds,
                               model_type='lgb',
@@ -151,3 +169,4 @@ result_dict_lgb = train_model(X=X_tr,
 
 
 #%%
+r = result_dict_lgb['feature_importance']

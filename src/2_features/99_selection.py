@@ -7,6 +7,7 @@ cols_to_use = ['Type', 'Age', 'Breed1', 'Breed2', 'Gender', 'Color1', 'Color2', 
 cols_to_discard = [
     'RescuerID',
     'Description',
+    'Name',
 ]
 df_all_final = df_all[[col for col in df_all.columns if col not in cols_to_discard]]
 

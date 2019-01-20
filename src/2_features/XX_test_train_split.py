@@ -15,3 +15,4 @@ X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
 X_te = df_te.drop(['AdoptionSpeed'], axis=1)
 
 X_tr.info()
+

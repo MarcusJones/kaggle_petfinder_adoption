@@ -176,6 +176,7 @@ tx_definitions = [(col_name, NumericalToCat(label_maps)) for col_name in label_m
 # input_df - Ensure the passed in column enters as a series or DF
 # df_out - Ensure the pipeline returns a df
 # default - if a column is not transformed, keep it unchanged!
+# The categorical dtype is LOST!
 data_mapper = DataFrameMapper(
     tx_definitions,
 input_df=True, df_out=True, default=None)
@@ -186,20 +187,14 @@ for step in data_mapper.features:
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
 
-logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.debug("Size of train DF with string columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
 for col in label_maps:
     print(col)
     df_all[col] = df_all[col].astype('category')
-logging.debug("Size of transformed train DF: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.debug("Reapplied categorical features".format())
+logging.debug("Size of train DF with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
-#%%
-
-# df_all['Health'] = df_all['Health'].astype(;)
-# r =
-# r
-# r = r.astype('category')
-# r
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 
