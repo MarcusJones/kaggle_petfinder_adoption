@@ -28,7 +28,6 @@ SAMPLE_FRACTION = 1
 # Standard imports
 # =============================================================================
 import os
-import yaml
 from pathlib import Path
 import sys
 import zipfile

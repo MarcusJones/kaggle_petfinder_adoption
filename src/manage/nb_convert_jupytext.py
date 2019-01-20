@@ -32,18 +32,15 @@ for folder in script_folders:
     logging.debug("Script folder {}".format(folder))
     kernel_files[folder.stem] = list()
     for path_pyfile in folder.glob("*.py"):
-
         pyfile = path_pyfile.stem
-
         if pyfile == '__init__':
             continue
-
         pyfile_labels = pyfile.split('_')
-        print(pyfile_labels)
+        # print(pyfile_labels)
         if not len(pyfile_labels) >= 2:
             continue
         logging.debug("Adding {} to kernel".format(path_pyfile))
-        print(path_pyfile)
+        # print(path_pyfile)
         kernel_files[folder.stem].append(path_pyfile)
 
 #%% Sort the result
@@ -70,43 +67,14 @@ for k in kernel_files:
 with path_kernel_script_out.open('w') as fh:
     fh.writelines(script_lines)
 logging.debug("Wrote {}".format(path_kernel_script_out))
-#%%
 
-processed_cnt = 0
-# Walk the directory tree
-for item in path_ipy_root.iterdir():
-    if not item.is_dir():
-        continue
-    if not item.parts[-1] in notebook_folders:
-        continue
+#%% Convert to notebook
+# Parse the script to Jupyter format
+parsed = jupytext.reads("".join(script_lines), ext='.py', format_name='percent')
 
-    for script_path in item.glob('*.py'):
-        logging.info("Processing: ./{}/{}".format(script_path.parts[-2], script_path.parts[-1]))
+# Delete the file if it exists
+# if out_path.exists():
+#     out_path.unlink()
+jupytext.writef(parsed, path_kernel_notebook_out)
+logging.info("Wrote {}".format(path_kernel_notebook_out))
 
-        # Select (make) the output folder
-        jupyter_dir_name = script_path.parts[-2]
-        jupyter_path = path_jupyter_root / jupyter_dir_name
-        jupyter_path.mkdir(parents=True, exist_ok=True)
-
-        # The output path
-        jupyter_file_name = script_path.stem + '.ipynb'
-        out_path = jupyter_path / jupyter_file_name
-
-        script_lines = script_path.read_text()
-
-        # Concatenate the header
-        total_script_lines = header_lines + script_lines
-        logging.info("{}+{}={} total lines".format( len(header_lines.split('\n')), len(script_lines.split('\n')), len(total_script_lines.split('\n')), ))
-
-        # Parse the script to Jupyter format
-        parsed = jupytext.reads(total_script_lines, ext='.py', format_name='percent')
-
-        # Delete the file if it exists
-        if out_path.exists():
-            out_path.unlink()
-        logging.info("Wrote {}".format(out_path))
-        jupytext.writef(parsed, out_path)
-        processed_cnt +=1
-
-
-logging.info("Wrote {} files".format(processed_cnt))
