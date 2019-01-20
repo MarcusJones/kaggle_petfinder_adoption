@@ -149,7 +149,7 @@ result_dict_lgb = train_model(X=X_tr,
 
 
 #%% RESULTS
-r = result_dict_lgb['feature_importance']
+# r = result_dict_lgb['feature_importance']
 
 # cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
 #                 by="importance", ascending=False)[:50].index

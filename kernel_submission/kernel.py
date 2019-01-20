@@ -5,14 +5,22 @@ Created on Sun Jun 10 10:32:09 2018
 
 @author: m.jones
 """
-
+import os
 # %% Globals
 #
 # LANDSCAPE_A3 = (16.53, 11.69)
 # PORTRAIT_A3 = (11.69, 16.53)
 # LANDSCAPE_A4 = (11.69, 8.27)
+if 'KAGGLE_WORKING_DIR' in os.environ:
+    DEPLOYMENT = 'Kaggle'
+else:
+    DEPLOYMENT = 'Local'
 
-PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
+if DEPLOYMENT=='Kaggle':
+    PATH_DATA_ROOT = r"~"
+if DEPLOYMENT == 'Local':
+    PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
+
 SAMPLE_FRACTION = 1
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
 # PATH_OUT_KDE = r"/home/batman/git/hack_sfpd1/out_kde"
@@ -28,7 +36,6 @@ SAMPLE_FRACTION = 1
 # Standard imports
 # =============================================================================
 import os
-import yaml
 from pathlib import Path
 import sys
 import zipfile
@@ -112,11 +119,13 @@ logging.info("Data path {}".format(PATH_DATA_ROOT))
 logging.info(f"Loading files into memory")
 
 # def load_zip
-with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
-    df_train = pd.read_csv(f, delimiter=',')
-with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
-    df_test = pd.read_csv(f, delimiter=',')
+# with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
+#     df_train = pd.read_csv(f, delimiter=',')
+# with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
+#     df_test = pd.read_csv(f, delimiter=',')
 
+df_train = pd.read_csv(path_data / 'train.csv')
+df_test = pd.read_csv(path_data / 'test' / 'test.csv')
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")
 colors = pd.read_csv(path_data / "color_labels.csv")
@@ -128,6 +137,7 @@ logging.debug("Loaded test {}".format(df_test.shape))
 # Add a column to label the source of the data
 df_train['dataset_type'] = 'train'
 df_test['dataset_type'] = 'test'
+
 logging.debug("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)
 df_all.set_index('PetID',inplace=True)
@@ -606,7 +616,7 @@ result_dict_lgb = train_model(X=X_tr,
 
 
 #%% RESULTS
-r = result_dict_lgb['feature_importance']
+# r = result_dict_lgb['feature_importance']
 
 # cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
 #                 by="importance", ascending=False)[:50].index
@@ -617,8 +627,10 @@ r = result_dict_lgb['feature_importance']
 # sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
 # plt.title('LGB Features (avg over folds)')
 # plt.show()#%% Open the submission
-with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
-    df_submission = pd.read_csv(f, delimiter=',')
+# with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
+#     df_submission = pd.read_csv(f, delimiter=',')
+df_submission = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimiter=',')
+
 
 #%% Collect predicitons
 prediction = (result_dict_lgb['prediction'])

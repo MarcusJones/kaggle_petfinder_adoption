@@ -22,6 +22,7 @@ langdetect = "*"
 eli5 = "*"
 ipython = "*"
 sklearn-pandas = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.6"

@@ -1,6 +1,8 @@
 #%% Open the submission
-with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
-    df_submission = pd.read_csv(f, delimiter=',')
+# with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
+#     df_submission = pd.read_csv(f, delimiter=',')
+df_submission = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimiter=',')
+
 
 #%% Collect predicitons
 prediction = (result_dict_lgb['prediction'])

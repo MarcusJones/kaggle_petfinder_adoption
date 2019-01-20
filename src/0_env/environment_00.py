@@ -5,15 +5,25 @@ Created on Sun Jun 10 10:32:09 2018
 
 @author: m.jones
 """
-
+import os
 # %% Globals
 #
 # LANDSCAPE_A3 = (16.53, 11.69)
 # PORTRAIT_A3 = (11.69, 16.53)
 # LANDSCAPE_A4 = (11.69, 8.27)
+if 'KAGGLE_WORKING_DIR' in os.environ:
+    DEPLOYMENT = 'Kaggle'
+else:
+    DEPLOYMENT = 'Local'
 
-PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-SAMPLE_FRACTION = 1
+if DEPLOYMENT=='Kaggle':
+    PATH_DATA_ROOT = r"~"
+    SAMPLE_FRACTION = 1
+if DEPLOYMENT == 'Local':
+    PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
+    SAMPLE_FRACTION = 0.5
+
+
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
 # PATH_OUT_KDE = r"/home/batman/git/hack_sfpd1/out_kde"
 # PATH_REPORTING = r"/home/batman/git/hack_sfpd1/Reporting"
