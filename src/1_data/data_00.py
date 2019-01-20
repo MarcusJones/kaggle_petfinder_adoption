@@ -17,7 +17,7 @@ logging.info(f"Loading files into memory")
 # with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
 #     df_test = pd.read_csv(f, delimiter=',')
 
-df_train = pd.read_csv(path_data / 'train.csv')
+df_train = pd.read_csv(path_data / 'train'/ 'train.csv')
 df_test = pd.read_csv(path_data / 'test' / 'test.csv')
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")

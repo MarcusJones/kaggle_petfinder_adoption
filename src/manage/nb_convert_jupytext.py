@@ -63,17 +63,24 @@ assert path_transformers.exists()
 with path_transformers.open() as fh:
     utils_lines = fh.readlines()
 
-utils_lines.insert(0, "#%% TRANSFORMERS\ntransfomers_module = r'''\n")
-utils_lines.append("'''\n")
-utils_lines.append("#%%\n")
-utils_lines.append("from pathlib import Path\n")
-utils_lines.append("util_outpath = Path.cwd() / 'transformers.py'\n")
-utils_lines.append("with util_outpath.open('w') as fh: fh.writelines(transfomers_module)\n")
-utils_lines.append("print('*** Wrote {}'.format(util_outpath))")
-utils_lines.append("#%%\n")
+clean_lines = list()
+for line in utils_lines:
+    out_line = line.replace('#%%', "#")
+    out_line = out_line.replace('# %%', "#")
+    clean_lines.append(out_line)
 
-script_lines = script_lines + utils_lines
-logging.debug("Appended path_transformers {} lines".format(len(utils_lines)))
+del utils_lines
+clean_lines.insert(0, "#%% TRANSFORMERS\ntransfomers_module = r'''\n")
+clean_lines.append("'''\n")
+clean_lines.append("#%%\n")
+clean_lines.append("from pathlib import Path\n")
+clean_lines.append("util_outpath = Path.cwd() / 'transformers.py'\n")
+clean_lines.append("with util_outpath.open('w') as fh: fh.writelines(transfomers_module)\n")
+clean_lines.append("print('*** Wrote {}'.format(util_outpath))")
+clean_lines.append("#%%\n")
+
+script_lines = script_lines + clean_lines
+logging.debug("Appended path_transformers {} lines".format(len(clean_lines)))
 
 #%% Append all python files to a single script
 

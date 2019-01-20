@@ -7,9 +7,7 @@ import numpy as np
 import sklearn.preprocessing
 import sklearn.base
 
-
-
-#%%
+#
 def timeit(method):
     """ Decorator to time execution of transformers
     :param method:
@@ -27,8 +25,7 @@ def timeit(method):
         return result
     return timed
 
-
-#%%
+#
 class TransformerLog():
     """Add a .log attribute for logging
     """
@@ -36,9 +33,7 @@ class TransformerLog():
     def log(self):
         return "Transformer: {}".format(type(self).__name__)
 
-
-
-# %%==============================================================================
+#==============================================================================
 # Empty
 # ===============================================================================
 class Empty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -55,7 +50,7 @@ class Empty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
         print(self.log)
         return df
 
-# %%==============================================================================
+#==============================================================================
 # Imputer1D - Simple Imputer wrapper
 # ===============================================================================
 class Imputer1D(sk.preprocessing.Imputer):
@@ -74,7 +69,7 @@ class Imputer1D(sk.preprocessing.Imputer):
             # Call the Imputer as normal, return result
         return super(Imputer1D, self).transform(X)
 
-#%%
+#
 class MultipleToNewFeature(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
     """
     """
@@ -92,7 +87,7 @@ class MultipleToNewFeature(sk.base.BaseEstimator, sk.base.TransformerMixin, Tran
         print(self.log, "{}({}) -> ['{}']".format(self.func.__name__,self.selected_cols,self.new_col_name))
         return df
 
-# %%==============================================================================
+#==============================================================================
 # NumericalToCat - DataFrameMapper only!
 # ===============================================================================
 class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -125,7 +120,7 @@ class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, Transforme
 # train['FurLength'] = train['FurLength'].astype('category')
 # train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
 
-#%%==============================================================================
+#==============================================================================
 # WordCounter
 # ===============================================================================
 class WordCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -144,8 +139,7 @@ class WordCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLo
         print(self.log, self.new_col_name)
         return df
 
-
-#%% =============================================================================
+# =============================================================================
 # ConvertToDatetime
 # ===============================================================================
 class ConvertToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -164,9 +158,7 @@ class ConvertToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, Transfo
         print("Transformer:", type(self).__name__, "converted", self.time_col_name, "to dt")
         return df
 
-
-
-#%% =============================================================================
+# =============================================================================
 # TimeProperty
 # ===============================================================================
 class TimeProperty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -198,8 +190,6 @@ class TimeProperty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerL
             raise
         print("Transformer:", type(self).__name__, original_shape, "->", df.shape, vars(self))
         return df
-
-
 # Debug:
 # df = X_train
 # time_col_name = 'question_utc'
@@ -210,20 +200,8 @@ class TimeProperty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerL
 # time_property = 'month'
 # time_adder = TimeProperty(time_col_name,new_col_name,time_property)
 # res=time_adder.transform(df)
-#
 
-
-
-
-
-
-
-
-
-
-
-
-#%% =============================================================================
+# =============================================================================
 # DEPRECIATED - AnswerDelay
 # ===============================================================================
 class AnswerDelay(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -249,9 +227,8 @@ class AnswerDelay(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLo
 # new_col_name = 'answer_delay_seconds'
 # answer_delay_adder = AnswerDelay(new_col_name)
 # res=answer_delay_adder.transform(df)
-#
 
-#%% =============================================================================
+# =============================================================================
 # ValueCounter
 # ===============================================================================
 class ValueCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -273,8 +250,7 @@ class ValueCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerL
         print(self.log)
         return pd.merge(selected_df_col, df, on=self.col_name)
 
-
-# %%=============================================================================
+#=============================================================================
 # DEPRECIATED ConvertDoubleColToDatetime
 # ===============================================================================
 class ConvertDoubleColToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
@@ -306,13 +282,13 @@ class ConvertDoubleColToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin
 # df = sfpd_head
 # new_col_name = 'dt'
 # time_adder = ConvertDoubleColToDatetime(new_col_name,name_col1="Date", name_col2="Time",this_format=r'%m/%d/%Y %H:%M')
-# res=time_adder.transform(df)
-'''
+# res=time_adder.transform(df)'''
 #%%
 from pathlib import Path
 util_outpath = Path.cwd() / 'transformers.py'
 with util_outpath.open('w') as fh: fh.writelines(transfomers_module)
 print('*** Wrote {}'.format(util_outpath))#%%
+#%%
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -452,7 +428,7 @@ logging.info(f"Loading files into memory")
 # with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
 #     df_test = pd.read_csv(f, delimiter=',')
 
-df_train = pd.read_csv(path_data / 'train.csv')
+df_train = pd.read_csv(path_data / 'train'/ 'train.csv')
 df_test = pd.read_csv(path_data / 'test' / 'test.csv')
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")
