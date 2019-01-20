@@ -366,7 +366,7 @@ if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
 else:
     DEPLOYMENT = 'Local'
-
+logging.debug("Deployment: {}".format(DEPLOYMENT))
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
@@ -438,7 +438,7 @@ import seaborn as sns
 # Data source and paths
 # =============================================================================
 path_data = Path(PATH_DATA_ROOT, r"").expanduser()
-assert path_data.exists()
+assert path_data.exists(), "Data path does not exist: {}".format(path_data)
 logging.info("Data path {}".format(PATH_DATA_ROOT))
 
 #%% ===========================================================================

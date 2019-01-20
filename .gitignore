@@ -84,3 +84,5 @@ target/
 # vim
 *.swp
 *.swo
+input/**/*
+input

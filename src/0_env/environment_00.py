@@ -51,7 +51,7 @@ if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
 else:
     DEPLOYMENT = 'Local'
-
+logging.debug("Deployment: {}".format(DEPLOYMENT))
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
