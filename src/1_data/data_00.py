@@ -42,7 +42,7 @@ logging.info("Data path {}".format(PATH_DATA_ROOT))
 #%% ===========================================================================
 # Load data
 # =============================================================================
-logging.info(f"Load")
+logging.info(f"Loading files into memory")
 
 # def load_zip
 with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
@@ -176,7 +176,9 @@ tx_definitions = [(col_name, NumericalToCat(label_maps)) for col_name in label_m
 # input_df - Ensure the passed in column enters as a series or DF
 # df_out - Ensure the pipeline returns a df
 # default - if a column is not transformed, keep it unchanged!
+# WARNINGS:
 # The categorical dtype is LOST!
+# Do NOT use DataFrameMapper for creating new columns, use a regular pipeline!
 data_mapper = DataFrameMapper(
     tx_definitions,
 input_df=True, df_out=True, default=None)
@@ -195,6 +197,10 @@ for col in label_maps:
 logging.debug("Reapplied categorical features".format())
 logging.debug("Size of train DF with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
+
+#%% SUMMARY
+
+logging.debug("Final df_all {}".format(df_all.shape))
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 

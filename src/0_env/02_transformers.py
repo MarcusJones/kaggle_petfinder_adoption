@@ -115,8 +115,9 @@ class WordCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLo
         return self
 
     def transform(self, df, y=None):
-        df[self.new_col_name] = df[self.col_name].apply(lambda x: len(x.split(" ")))
-        print(self.log)
+        new_col = df[self.col_name].apply(lambda x: len(x.split(" ")))
+        df[self.new_col_name] = new_col
+        print(self.log, self.new_col_name)
         return df
 
 
