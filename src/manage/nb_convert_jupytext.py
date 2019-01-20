@@ -56,12 +56,23 @@ for k in kernel_files:
 
 #%%
 script_lines = list()
+
+
 #%% Collect all imported tools
 UTILS_DIR = Path('~/kaggle/kaggle_utils/kaggle_utils/').expanduser()
+
+
 path_transformers = UTILS_DIR / 'transformers.py'
 assert path_transformers.exists()
 with path_transformers.open() as fh:
     utils_lines = fh.readlines()
+with path_transformers.open() as fh:
+    utils_lines = fh.read()
+import bz2
+
+payload = bz2.compress(bytes(utils_lines, 'utf8'))
+bz2.decompress(payload)
+
 
 clean_lines = list()
 for line in utils_lines:
