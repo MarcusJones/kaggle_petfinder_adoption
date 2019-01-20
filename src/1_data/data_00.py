@@ -16,8 +16,7 @@ with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
     df_train = pd.read_csv(f, delimiter=',')
 with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
     df_test = pd.read_csv(f, delimiter=',')
-with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
-    df_sample_submission = pd.read_csv(f, delimiter=',')
+
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")
 colors = pd.read_csv(path_data / "color_labels.csv")
