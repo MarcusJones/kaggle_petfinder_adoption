@@ -36,7 +36,7 @@ df_all.set_index('PetID',inplace=True)
 del df_train, df_test
 
 #%% Memory of the training DF:
-logging.debug("Size of DF: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
+logging.debug("Size of df_all: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
@@ -157,13 +157,13 @@ for i, step in enumerate(data_mapper.features):
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
 
-logging.debug("Size of train DF with string columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.debug("Size of train df_all with string columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
 for col in label_maps:
     print(col)
     df_all[col] = df_all[col].astype('category')
 logging.debug("Reapplied categorical features".format())
-logging.debug("Size of train DF with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.debug("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
 
 #%% SUMMARY
