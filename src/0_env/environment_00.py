@@ -9,6 +9,36 @@ Created on Sun Jun 10 10:32:09 2018
 #%%
 #!pip install git+https://github.com/MarcusJones/kaggle_utils.git
 
+#%% ===========================================================================
+# Logging
+# =============================================================================
+import sys
+import logging
+
+#Delete Jupyter notebook root logger handler
+logger = logging.getLogger()
+logger.handlers = []
+
+# Set level
+logger.setLevel(logging.DEBUG)
+
+# Create formatter
+#FORMAT = "%(asctime)s - %(levelno)-3s - %(module)-10s  %(funcName)-10s: %(message)s"
+#FORMAT = "%(asctime)s - %(levelno)-3s - %(funcName)-10s: %(message)s"
+#FORMAT = "%(asctime)s - %(funcName)-10s: %(message)s"
+FORMAT = "%(asctime)s : %(message)s"
+DATE_FMT = "%Y-%m-%d %H:%M:%S"
+#DATE_FMT = "%H:%M:%S"
+formatter = logging.Formatter(FORMAT, DATE_FMT)
+
+# Create handler and assign
+handler = logging.StreamHandler(sys.stderr)
+handler.setFormatter(formatter)
+logger.handlers = [handler]
+logging.debug("Logging started")
+
+
+
 #%%
 import os
 from pathlib import Path
@@ -25,9 +55,11 @@ else:
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
+    import transformers as trf
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
     SAMPLE_FRACTION = 0.5
+    import kaggle_utils.transformers as trf
 
 
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
@@ -84,32 +116,5 @@ import seaborn as sns
 #%% ===========================================================================
 # Custom imports
 # =============================================================================
-import kaggle_utils.transformers as trf
-
-#%% ===========================================================================
-# Logging
-# =============================================================================
-import logging
-#Delete Jupyter notebook root logger handler
-logger = logging.getLogger()
-logger.handlers = []
-
-# Set level
-logger.setLevel(logging.DEBUG)
-
-# Create formatter
-#FORMAT = "%(asctime)s - %(levelno)-3s - %(module)-10s  %(funcName)-10s: %(message)s"
-#FORMAT = "%(asctime)s - %(levelno)-3s - %(funcName)-10s: %(message)s"
-#FORMAT = "%(asctime)s - %(funcName)-10s: %(message)s"
-FORMAT = "%(asctime)s : %(message)s"
-DATE_FMT = "%Y-%m-%d %H:%M:%S"
-#DATE_FMT = "%H:%M:%S"
-formatter = logging.Formatter(FORMAT, DATE_FMT)
-
-# Create handler and assign
-handler = logging.StreamHandler(sys.stderr)
-handler.setFormatter(formatter)
-logger.handlers = [handler]
-logging.debug("Logging started")
 
 

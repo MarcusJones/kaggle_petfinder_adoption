@@ -54,8 +54,29 @@ for k in kernel_files:
     for f in kernel_files[k]:
         print('\t', f.stem)
 
-#%% Append all python files to a single script
+#%%
 script_lines = list()
+#%% Collect all imported tools
+UTILS_DIR = Path('~/kaggle/kaggle_utils/kaggle_utils/').expanduser()
+path_transformers = UTILS_DIR / 'transformers.py'
+assert path_transformers.exists()
+with path_transformers.open() as fh:
+    utils_lines = fh.readlines()
+
+utils_lines.insert(0, "#%% TRANSFORMERS\ntransfomers_module = r'''\n")
+utils_lines.append("'''\n")
+utils_lines.append("#%%\n")
+utils_lines.append("from pathlib import Path\n")
+utils_lines.append("util_outpath = Path.cwd() / 'transformers.py'\n")
+utils_lines.append("with util_outpath.open('w') as fh: fh.writelines(transfomers_module)\n")
+utils_lines.append("print('*** Wrote {}'.format(util_outpath))")
+utils_lines.append("#%%\n")
+
+script_lines = script_lines + utils_lines
+logging.debug("Appended path_transformers {} lines".format(len(utils_lines)))
+
+#%% Append all python files to a single script
+
 for k in kernel_files:
     for f in kernel_files[k]:
         with f.open() as fh:
