@@ -15,10 +15,10 @@ def kappa(y_true, y_pred):
 # Load reference kernel submissions
 ref_submissions = dict()
 
-name = 'Lukyanenko_Exploration_of_data_step_by_step'
-# ref_submissions[name] = Path.cwd() / 'references' / name / 'submission.csv'
+name = 'Lukyanenko_Exploration_of_data_step_by_step 319'
+ref_submissions[name] = Path.cwd() / 'references' / name / 'submission.csv'
 
-name = 'Scuccimarra_PetFinder Simple LGBM Baseline'
+name = 'Scuccimarra_PetFinder Simple LGBM Baseline 408'
 ref_submissions[name] = Path.cwd() / 'references' / name / 'submission.csv'
 
 dfs = dict()
@@ -42,6 +42,7 @@ df_final.describe()
 # df_final.apply(pd.Series.value_counts, axis=1)
 # %%
 # count_df = pd.DataFrame()
+
 for col in df_final:
     print(col)
     total = len(df_final[col])
@@ -56,5 +57,6 @@ for col in df_final:
     res.sort_index(inplace=True)
 
     cnt_dict = counts.sort_index().to_dict()
+    print(cnt_dict)
 
 
