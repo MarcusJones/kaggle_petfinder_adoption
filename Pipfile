@@ -23,6 +23,7 @@ eli5 = "*"
 ipython = "*"
 sklearn-pandas = "*"
 ipykernel = "*"
+ascii-graph = "*"
 
 [requires]
 python_version = "3.6"
