@@ -194,6 +194,10 @@ df_all['Vaccinated'] = df_all['Vaccinated'] - 1
 
 pandas.CategoricalIndex.reorder_categories
 
+# To return the original integer mapping!
+ivd = {v: k for k, v in label_maps['State'].items()}
+df_all['State'].astype('object').replace(ivd)
+
 #%% Dynamically create the transformation definitions
 tx_definitions_preview = [(col_name, label_maps[col_name]) for col_name in label_maps]
 for t in tx_definitions_preview:
