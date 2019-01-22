@@ -175,14 +175,29 @@ class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, Transforme
         assert return_series.dtype == 'category'
         return return_series
 
-this_series = df_all['Vaccinated'].copy()
-this_series.value_counts()
-label_map = label_maps['Vaccinated']
-mapped_labels = list(label_map.values())
-my_labels = pd.Index(mapped_labels)
-pd.Series(pd.Categorical.from_codes(this_series, my_labels))
+# this_series = df_all['Vaccinated'].copy()
+# this_series.value_counts()
+# label_map = label_maps['Vaccinated']
+# mapped_labels = list(label_map.values())
+# my_labels = pd.Index(mapped_labels)
+# pd.Series(pd.Categorical.from_codes(this_series, my_labels))
+
+for col_name in label_maps:
+    df_all[col_name].value_counts().index
+    print(col_name)
+    label_maps[col_name]
+    df_all.replace({col_name: label_maps[col_name]},inplace=True)
+
+
+
+df_all['Vaccinated'] = df_all['Vaccinated'] - 1
+
+pandas.CategoricalIndex.reorder_categories
 
 #%% Dynamically create the transformation definitions
+tx_definitions_preview = [(col_name, label_maps[col_name]) for col_name in label_maps]
+for t in tx_definitions_preview:
+    print(t)
 tx_definitions = [(col_name, NumericalToCat(label_maps[col_name])) for col_name in label_maps]
 
 tx_definitions = [tx_definitions[0]]
