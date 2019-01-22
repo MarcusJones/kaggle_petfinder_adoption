@@ -18,7 +18,9 @@ logging.info(f"Loading files into memory")
 #     df_test = pd.read_csv(f, delimiter=',')
 
 df_train = pd.read_csv(path_data / 'train'/ 'train.csv')
+df_train.set_index(['PetID'],inplace=True)
 df_test = pd.read_csv(path_data / 'test' / 'test.csv')
+df_test.set_index(['PetID'],inplace=True)
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")
 colors = pd.read_csv(path_data / "color_labels.csv")
@@ -31,9 +33,13 @@ logging.debug("Loaded test {}".format(df_test.shape))
 df_train['dataset_type'] = 'train'
 df_test['dataset_type'] = 'test'
 
+# Set this aside for debugging
+#TODO: Remove later
+original_y_train = df_train['AdoptionSpeed'].copy()
+
 logging.debug("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)
-df_all.set_index('PetID',inplace=True)
+# df_all.set_index('PetID',inplace=True)
 
 del df_train, df_test
 
@@ -136,8 +142,50 @@ logging.debug("Category mappings for {} columns created".format(len(label_maps))
 for map in label_maps:
     print(map, label_maps[map])
 
+#%% Restructure the dict
+#%% DEBUG TRF
+
+class TransformerLog():
+    """Add a .log attribute for logging
+    """
+    @property
+    def log(self):
+        return "Transformer: {}".format(type(self).__name__)
+class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
+    """Convert numeric indexed column into dtype category with labels
+    Convert a column which has a category, presented as an Integer
+    Initialize with a dict of ALL mappings for this session, keyed by column name
+    (This could be easily refactored to have only the required mapping)
+    """
+    def __init__(self,label_map):
+        self.label_map = label_map
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, this_series):
+        assert type(this_series) == pd.Series
+        mapped_labels = list(self.label_map.values())
+        # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.Name)
+        return_series = this_series.copy()
+        return_series = pd.Series(pd.Categorical.from_codes(this_series, mapped_labels))
+        # return_series = return_series.astype('category')
+        # return_series.cat.rename_categories(self.label_map_dict[return_series.name], inplace=True)
+        print(self.log, mapped_labels, return_series.cat.categories, )
+        assert return_series.dtype == 'category'
+        return return_series
+
+this_series = df_all['Vaccinated'].copy()
+this_series.value_counts()
+label_map = label_maps['Vaccinated']
+mapped_labels = list(label_map.values())
+my_labels = pd.Index(mapped_labels)
+pd.Series(pd.Categorical.from_codes(this_series, my_labels))
+
 #%% Dynamically create the transformation definitions
-tx_definitions = [(col_name, trf.NumericalToCat(label_maps)) for col_name in label_maps]
+tx_definitions = [(col_name, NumericalToCat(label_maps[col_name])) for col_name in label_maps]
+
+tx_definitions = [tx_definitions[0]]
 
 #%% Pipeline
 # Build the pipeline

@@ -2,7 +2,6 @@
 df_tr = df_all[df_all['dataset_type']=='train'].copy()
 df_tr.drop('dataset_type', axis=1, inplace=True)
 
-df_cv = df_tr.
 df_te = df_all[df_all['dataset_type']=='test'].copy()
 df_te.drop('dataset_type', axis=1, inplace=True)
 
