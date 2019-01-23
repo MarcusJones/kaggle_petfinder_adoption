@@ -83,13 +83,17 @@ import zipfile
 from datetime import datetime
 import gc
 import time
+from pprint import pprint
 
 #%% ===========================================================================
 # ML imports
 # =============================================================================
 import numpy as np
+print('numpy', np.__version__)
 import pandas as pd
+print('pandas', pd.__version__)
 import sklearn as sk
+print('sklearn', sk.__version__)
 
 import sklearn.preprocessing
 import sklearn.model_selection
@@ -102,8 +106,12 @@ from sklearn_pandas import DataFrameMapper
 
 # Models
 import lightgbm as lgb
+print("lightgbm", lgb.__version__)
 import xgboost as xgb
+print("xgboost", xgb.__version__)
 from catboost import CatBoostClassifier
+import catboost as catb
+print("catboost", catb.__version__)
 
 # Metric
 from sklearn.metrics import cohen_kappa_score

@@ -1,0 +1,153 @@
+#%%
+
+def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance=False,
+                averaging='usual', make_oof=False):
+
+    logging.debug("Starting training {}".format(model_type))
+    result_dict = {}
+    if make_oof:
+        oof = np.zeros(len(X))
+    prediction = np.zeros(len(X_test))
+    scores = []
+    feature_importance = pd.DataFrame()
+    for fold_n, (train_index, valid_index) in enumerate(folds.split(X, y)):
+        gc.collect()
+        print('Fold', fold_n + 1, 'started at', time.ctime())
+        X_train, X_valid = X.iloc[train_index], X.iloc[valid_index]
+        y_train, y_valid = y.iloc[train_index], y.iloc[valid_index]
+
+        if model_type == 'lgb':
+            train_data = lgb.Dataset(X_train, label=y_train)
+            valid_data = lgb.Dataset(X_valid, label=y_valid)
+
+            model = lgb.train(params,
+                              train_data,
+                              num_boost_round=2000,
+                              valid_sets=[train_data, valid_data],
+                              verbose_eval=100,
+                              early_stopping_rounds=200)
+
+            del train_data, valid_data
+
+            y_pred_valid = model.predict(X_valid, num_iteration=model.best_iteration).argmax(1)
+            del X_valid
+            gc.collect()
+            y_pred = model.predict(X_test, num_iteration=model.best_iteration).argmax(1)
+
+        if model_type == 'xgb':
+            train_data = xgb.DMatrix(data=X_train, label=y_train)
+            valid_data = xgb.DMatrix(data=X_valid, label=y_valid)
+
+            watchlist = [(train_data, 'train'), (valid_data, 'valid_data')]
+            model = xgb.train(dtrain=train_data, num_boost_round=20000, evals=watchlist, early_stopping_rounds=200,
+                              verbose_eval=500, params=params)
+            y_pred_valid = model.predict(xgb.DMatrix(X_valid), ntree_limit=model.best_ntree_limit)
+            y_pred = model.predict(xgb.DMatrix(X_test), ntree_limit=model.best_ntree_limit)
+
+        if model_type == 'lcv':
+            model = LogisticRegressionCV(scoring='neg_log_loss', cv=3, multi_class='multinomial')
+            model.fit(X_train, y_train)
+
+            y_pred_valid = model.predict(X_valid)
+            y_pred = model.predict(X_test)
+
+        if model_type == 'cat':
+            model = CatBoostClassifier(iterations=20000, loss_function='MultiClass', **params)
+            model.fit(X_train, y_train, eval_set=(X_valid, y_valid), cat_features=[], use_best_model=True,
+                      verbose=False)
+
+            y_pred_valid = model.predict(X_valid)
+            y_pred = model.predict(X_test).reshape(-1, )
+
+        if make_oof:
+            oof[valid_index] = y_pred_valid.reshape(-1, )
+
+        scores.append(kappa(y_valid, y_pred_valid))
+        print('Fold kappa:', kappa(y_valid, y_pred_valid))
+        print('')
+
+        if averaging == 'usual':
+            prediction += y_pred
+        elif averaging == 'rank':
+            prediction += pd.Series(y_pred).rank().values
+
+        if model_type == 'lgb':
+            # feature importance
+            fold_importance = pd.DataFrame()
+            fold_importance["feature"] = X.columns
+            fold_importance["importance"] = model.feature_importance()
+            fold_importance["fold"] = fold_n + 1
+            feature_importance = pd.concat([feature_importance, fold_importance], axis=0)
+
+    prediction /= n_fold
+
+    print('CV mean score: {0:.4f}, std: {1:.4f}.'.format(np.mean(scores), np.std(scores)))
+
+    if model_type == 'lgb':
+
+        if plot_feature_importance:
+            feature_importance["importance"] /= n_fold
+            cols = feature_importance[["feature", "importance"]].groupby("feature").mean().sort_values(
+                by="importance", ascending=False)[:50].index
+
+            best_features = feature_importance.loc[feature_importance.feature.isin(cols)]
+
+            # plt.figure(figsize=(16, 12));
+            # sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False));
+            # plt.title('LGB Features (avg over folds)');
+
+            result_dict['feature_importance'] = feature_importance
+
+    result_dict['prediction'] = prediction
+    if make_oof:
+        result_dict['oof'] = oof
+
+    return result_dict
+#
+
+#%%
+params = {'num_leaves': 128,
+        #  'min_data_in_leaf': 60,
+         'objective': 'multiclass',
+         'max_depth': -1,
+         'learning_rate': 0.05,
+         "boosting": "gbdt",
+         "feature_fraction": 0.9,
+         "bagging_freq": 3,
+         "bagging_fraction": 0.9,
+         "bagging_seed": 11,
+        #  "lambda_l1": 0.1,
+         # "lambda_l2": 0.1,
+         "random_state": 42,
+         "verbosity": -1,
+         "num_class": 5}
+
+#%%
+
+# X_tr.info()
+# y_tr.astype('int')
+# y_tr.dtype
+# y_factors = y_tr.factorize()[0]
+y_integers = y_tr.cat.codes
+result_dict_lgb = train_model(X=X_tr,
+                              X_test=X_te,
+                              y=y_integers,
+                              params=params,
+                              folds=folds,
+                              model_type='lgb',
+                              plot_feature_importance=True,
+                              make_oof=True)
+
+
+#%% RESULTS
+# r = result_dict_lgb['feature_importance']
+
+# cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
+#                 by="importance", ascending=False)[:50].index
+#
+# best_features = result_dict_lgb['feature_importance'].loc[result_dict_lgb['feature_importance'].feature.isin(cols)]
+#
+# p = plt.figure(figsize=(16, 12))
+# sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
+# plt.title('LGB Features (avg over folds)')
+# plt.show()

@@ -21,7 +21,7 @@ def pure_breed(row):
 
 #%% Build the pipeline
 this_pipeline = sk.pipeline.Pipeline([
-        ('counr', trf.MultipleToNewFeature(['Breed1','Breed2'], 'Pure Breed', pure_breed)),
+        ('feat: Pure Breed', trf.MultipleToNewFeature(['Breed1','Breed2'], 'Pure Breed', pure_breed)),
         ])
 
 logging.info("Created pipeline:")
