@@ -24,6 +24,7 @@ ipython = "*"
 sklearn-pandas = "*"
 ipykernel = "*"
 ascii-graph = "*"
+jinja2 = "*"
 
 [requires]
 python_version = "3.6"

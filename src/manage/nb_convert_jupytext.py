@@ -58,37 +58,7 @@ for k in kernel_files:
 script_lines = list()
 
 
-#%% Collect all imported tools
-UTILS_DIR = Path('~/kaggle/kaggle_utils/kaggle_utils/').expanduser()
 
-
-path_transformers = UTILS_DIR / 'transformers.py'
-assert path_transformers.exists()
-with path_transformers.open() as fh:
-    utils_lines = fh.readlines()
-with path_transformers.open() as fh:
-    utils_lines = fh.read()
-import bz2
-
-payload = bz2.compress(bytes(utils_lines, 'utf8'))
-bz2.decompress(payload)
-
-
-clean_lines = list()
-for line in utils_lines:
-    out_line = line.replace('#%%', "#")
-    out_line = out_line.replace('# %%', "#")
-    clean_lines.append(out_line)
-
-del utils_lines
-clean_lines.insert(0, "#%% TRANSFORMERS\ntransfomers_module = r'''\n")
-clean_lines.append("'''\n")
-clean_lines.append("#%%\n")
-clean_lines.append("from pathlib import Path\n")
-clean_lines.append("util_outpath = Path.cwd() / 'transformers.py'\n")
-clean_lines.append("with util_outpath.open('w') as fh: fh.writelines(transfomers_module)\n")
-clean_lines.append("print('*** Wrote {}'.format(util_outpath))")
-clean_lines.append("#%%\n")
 
 script_lines = script_lines + clean_lines
 logging.debug("Appended path_transformers {} lines".format(len(clean_lines)))
