@@ -3,6 +3,11 @@
 n_fold = 5
 folds = sk.model_selection.StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
 
+
+
+
+
+
 #%%
 
 def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance=False,
@@ -22,10 +27,6 @@ def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance
         y_train, y_valid = y.iloc[train_index], y.iloc[valid_index]
 
         if model_type == 'lgb':
-            # logging.debug("Categorical column selection here!! TODO: NB".format())
-            # cat_cols = X.columns.to_list
-            # X_tr.columns.to_list()
-
             train_data = lgb.Dataset(X_train, label=y_train)
             valid_data = lgb.Dataset(X_valid, label=y_valid)
 

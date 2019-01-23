@@ -142,70 +142,54 @@ logging.debug("Category mappings for {} columns created".format(len(label_maps))
 for map in label_maps:
     print(map, label_maps[map])
 
-#%% Restructure the dict
-#%% DEBUG TRF
 
-class TransformerLog():
-    """Add a .log attribute for logging
-    """
-    @property
-    def log(self):
-        return "Transformer: {}".format(type(self).__name__)
-class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
+# %%
+class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin):
     """Convert numeric indexed column into dtype category with labels
     Convert a column which has a category, presented as an Integer
     Initialize with a dict of ALL mappings for this session, keyed by column name
     (This could be easily refactored to have only the required mapping)
     """
-    def __init__(self,label_map):
-        self.label_map = label_map
+
+    def __init__(self, label_map_dict, allow_more_labels=False):
+        self.label_map_dict = label_map_dict
+        self.allow_more_labels = allow_more_labels
 
     def fit(self, X, y=None):
         return self
 
+    def get_unique_values(self, this_series):
+        return list(this_series.value_counts().index)
+
     def transform(self, this_series):
+        if not self.allow_more_labels:
+            if len(self.label_map_dict) > len(this_series.value_counts()):
+                msg = "{} labels provided, but {} values in column!\nLabels:{}\nValues:{}".format(
+                    len(self.label_map_dict), len(this_series.value_counts()), self.label_map_dict,
+                    self.get_unique_values(this_series), )
+                raise ValueError(msg)
+
+        if len(self.label_map_dict) < len(this_series.value_counts()):
+            raise ValueError
+
         assert type(this_series) == pd.Series
-        mapped_labels = list(self.label_map.values())
-        # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.Name)
+        # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.name)
         return_series = this_series.copy()
-        return_series = pd.Series(pd.Categorical.from_codes(this_series, mapped_labels))
-        # return_series = return_series.astype('category')
-        # return_series.cat.rename_categories(self.label_map_dict[return_series.name], inplace=True)
-        print(self.log, mapped_labels, return_series.cat.categories, )
+        # return_series = pd.Series(pd.Categorical.from_codes(this_series, self.label_map_dict))
+        return_series = return_series.astype('category')
+        return_series.cat.rename_categories(self.label_map_dict, inplace=True)
+        # print(return_series.cat.categories)
+
         assert return_series.dtype == 'category'
         return return_series
 
-# this_series = df_all['Vaccinated'].copy()
-# this_series.value_counts()
-# label_map = label_maps['Vaccinated']
-# mapped_labels = list(label_map.values())
-# my_labels = pd.Index(mapped_labels)
-# pd.Series(pd.Categorical.from_codes(this_series, my_labels))
-
-for col_name in label_maps:
-    df_all[col_name].value_counts().index
-    print(col_name)
-    label_maps[col_name]
-    df_all.replace({col_name: label_maps[col_name]},inplace=True)
-
-
-
-df_all['Vaccinated'] = df_all['Vaccinated'] - 1
-
-pandas.CategoricalIndex.reorder_categories
-
-# To return the original integer mapping!
-ivd = {v: k for k, v in label_maps['State'].items()}
-df_all['State'].astype('object').replace(ivd)
 
 #%% Dynamically create the transformation definitions
-tx_definitions_preview = [(col_name, label_maps[col_name]) for col_name in label_maps]
-for t in tx_definitions_preview:
-    print(t)
-tx_definitions = [(col_name, NumericalToCat(label_maps[col_name])) for col_name in label_maps]
-
-tx_definitions = [tx_definitions[0]]
-
+# tx_definitions_preview = [(col_name, label_maps[col_name]) for col_name in label_maps]
+# for t in tx_definitions_preview:
+#     print(t)
+tx_definitions = [(col_name, NumericalToCat(label_maps[col_name], True)) for col_name in label_maps]
+# col_name = 'Vaccinated'
 #%% Pipeline
 # Build the pipeline
 # NOTES:
@@ -214,22 +198,23 @@ tx_definitions = [tx_definitions[0]]
 # default - if a column is not transformed, keep it unchanged!
 # WARNINGS:
 # The categorical dtype is LOST!
+# The mapping does NOT match the original!
 # Do NOT use DataFrameMapper for creating new columns, use a regular pipeline!
 data_mapper = DataFrameMapper(
     tx_definitions,
 input_df=True, df_out=True, default=None)
+logging.debug("Categorical transformer pipeline warnings, see docstring!".format())
 
-print("DataFrameMapper, applies transforms directly selected columns")
-for i, step in enumerate(data_mapper.features):
-    print(i, step)
+# print("DataFrameMapper, applies transforms directly selected columns")
+# for i, step in enumerate(data_mapper.features):
+#     print(i, step)
 
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
-
-logging.debug("Size of train df_all with string columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.debug("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
 for col in label_maps:
-    print(col)
+    # print(col)
     df_all[col] = df_all[col].astype('category')
 logging.debug("Reapplied categorical features".format())
 logging.debug("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
@@ -237,7 +222,7 @@ logging.debug("Size of df_all with categorical features: {} MB".format(sys.getsi
 
 #%% SUMMARY
 
-logging.debug("Final df_all {}".format(df_all.shape))
+logging.debug("Final shape of df_all {}".format(df_all.shape))
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 
