@@ -26,8 +26,8 @@ breeds = pd.read_csv(path_data / "breed_labels.csv")
 colors = pd.read_csv(path_data / "color_labels.csv")
 states = pd.read_csv(path_data / "state_labels.csv")
 
-logging.debug("Loaded train {}".format(df_train.shape))
-logging.debug("Loaded test {}".format(df_test.shape))
+logging.info("Loaded train {}".format(df_train.shape))
+logging.info("Loaded test {}".format(df_test.shape))
 
 # Add a column to label the source of the data
 df_train['dataset_type'] = 'train'
@@ -37,14 +37,14 @@ df_test['dataset_type'] = 'test'
 #TODO: Remove later
 original_y_train = df_train['AdoptionSpeed'].copy()
 
-logging.debug("Added dataset_type column for origin".format())
+logging.info("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)
 # df_all.set_index('PetID',inplace=True)
 
 del df_train, df_test
 
 #%% Memory of the training DF:
-logging.debug("Size of df_all: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
+logging.info("Size of df_all: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
@@ -137,51 +137,11 @@ label_maps['Color3'] = map_colors
 # And the states map
 label_maps['State'] = dict(zip(states['StateID'], states['StateName']))
 
-logging.debug("Category mappings for {} columns created".format(len(label_maps)))
+logging.info("Category mappings for {} columns created".format(len(label_maps)))
 
 for map in label_maps:
     print(map, label_maps[map])
 
-
-# %%
-class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin):
-    """Convert numeric indexed column into dtype category with labels
-    Convert a column which has a category, presented as an Integer
-    Initialize with a dict of ALL mappings for this session, keyed by column name
-    (This could be easily refactored to have only the required mapping)
-    """
-
-    def __init__(self, label_map_dict, allow_more_labels=False):
-        self.label_map_dict = label_map_dict
-        self.allow_more_labels = allow_more_labels
-
-    def fit(self, X, y=None):
-        return self
-
-    def get_unique_values(self, this_series):
-        return list(this_series.value_counts().index)
-
-    def transform(self, this_series):
-        if not self.allow_more_labels:
-            if len(self.label_map_dict) > len(this_series.value_counts()):
-                msg = "{} labels provided, but {} values in column!\nLabels:{}\nValues:{}".format(
-                    len(self.label_map_dict), len(this_series.value_counts()), self.label_map_dict,
-                    self.get_unique_values(this_series), )
-                raise ValueError(msg)
-
-        if len(self.label_map_dict) < len(this_series.value_counts()):
-            raise ValueError
-
-        assert type(this_series) == pd.Series
-        # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.name)
-        return_series = this_series.copy()
-        # return_series = pd.Series(pd.Categorical.from_codes(this_series, self.label_map_dict))
-        return_series = return_series.astype('category')
-        return_series.cat.rename_categories(self.label_map_dict, inplace=True)
-        # print(return_series.cat.categories)
-
-        assert return_series.dtype == 'category'
-        return return_series
 
 
 #%% Dynamically create the transformation definitions
@@ -203,7 +163,7 @@ tx_definitions = [(col_name, NumericalToCat(label_maps[col_name], True)) for col
 data_mapper = DataFrameMapper(
     tx_definitions,
 input_df=True, df_out=True, default=None)
-logging.debug("Categorical transformer pipeline warnings, see docstring!".format())
+logging.info("Categorical transformer pipeline warnings, see docstring!".format())
 
 # print("DataFrameMapper, applies transforms directly selected columns")
 # for i, step in enumerate(data_mapper.features):
@@ -211,18 +171,18 @@ logging.debug("Categorical transformer pipeline warnings, see docstring!".format
 
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
-logging.debug("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
 for col in label_maps:
     # print(col)
     df_all[col] = df_all[col].astype('category')
-logging.debug("Reapplied categorical features".format())
-logging.debug("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Reapplied categorical features".format())
+logging.info("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
 
 #%% SUMMARY
 
-logging.debug("Final shape of df_all {}".format(df_all.shape))
+logging.info("Final shape of df_all {}".format(df_all.shape))
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 

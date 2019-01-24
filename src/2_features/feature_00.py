@@ -31,7 +31,7 @@ for i, step in enumerate(this_pipeline.steps):
 #%% Fit Transform
 original_cols = df_all.columns
 df_all = this_pipeline.fit_transform(df_all)
-logging.debug("Pipeline complete. {} new columns.".format(len(df_all.columns) - len(original_cols)))
+logging.info("Pipeline complete. {} new columns.".format(len(df_all.columns) - len(original_cols)))
 
 
 #%%

@@ -60,7 +60,7 @@ clf_grid_BEST = clf_grid.best_estimator_
 #%% Do the final fit on the BEST estimator
 # start = datetime.datetime.now()
 # predicted = clf_grid_BEST.fit(train_X, train_Y)
-# logging.debug("Elapsed H:m:s: {}".format(datetime.datetime.now()-start))
+# logging.info("Elapsed H:m:s: {}".format(datetime.datetime.now()-start))
 
 #%% Predict on Test set
 # NB we only want the defaulters column!
@@ -79,7 +79,7 @@ predicted = clf_grid_BEST.predict(X_te)
 # folds = sk.model_selection.StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
 #
 # for fold_n, (train_indices, valid_indices) in enumerate(folds.split(X_tr, y_tr)):
-#     logging.debug("Fold {:<4} {:0.2f}|{:0.2f}% started {}".format(fold_n,
+#     logging.info("Fold {:<4} {:0.2f}|{:0.2f}% started {}".format(fold_n,
 #                                                        100*len(train_indices)/len(X_tr),
 #                                                        100*len(valid_indices)/len(X_tr),
 #                                                                   time.ctime()))
@@ -92,7 +92,7 @@ predicted = clf_grid_BEST.predict(X_te)
 #
 #
 #     pprint(model.get_params())
-#     logging.debug("Model instantiated".format())
+#     logging.info("Model instantiated".format())
 #
 #
 #     # model = lgb.train(params,

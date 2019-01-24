@@ -12,18 +12,18 @@ cols_to_discard = [
 ]
 
 
-logging.debug("Feature selection".format())
+logging.info("Feature selection".format())
 original_columns = df_all.columns
 # col_selection = [col for col in all_columns if col not in cols_to_discard]
 
 df_all.drop(cols_to_discard,inplace=True, axis=1)
 
-logging.debug("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
-logging.debug("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
+logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
-logging.debug("Record selection (sampling)".format())
-logging.debug("Sampling fraction: {}".format(SAMPLE_FRACTION))
+logging.info("Record selection (sampling)".format())
+logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
 df_all = df_all.sample(frac=SAMPLE_FRACTION)
-logging.debug("Final size of data frame: {}".format(df_all.shape))
-logging.debug("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Final size of data frame: {}".format(df_all.shape))
+logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 

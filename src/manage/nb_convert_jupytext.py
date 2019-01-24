@@ -6,7 +6,7 @@ Use this script to convert all *.py files to jupyter notebook format
 from pathlib import Path
 import jupytext
 import logging
-logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.info)
 import shutil
 from pprint import pprint
 #%%
@@ -29,7 +29,7 @@ script_folders.sort()
 #%% Iterate over files inside the folders
 kernel_files = dict()
 for folder in script_folders:
-    logging.debug("Script folder {}".format(folder))
+    logging.info("Script folder {}".format(folder))
     kernel_files[folder.stem] = list()
     for path_pyfile in folder.glob("*.py"):
         pyfile = path_pyfile.stem
@@ -39,7 +39,7 @@ for folder in script_folders:
         # print(pyfile_labels)
         if not len(pyfile_labels) >= 2:
             continue
-        logging.debug("Adding {} to kernel".format(path_pyfile))
+        logging.info("Adding {} to kernel".format(path_pyfile))
         # print(path_pyfile)
         kernel_files[folder.stem].append(path_pyfile)
 
@@ -61,7 +61,7 @@ script_lines = list()
 
 #
 # script_lines = script_lines + clean_lines
-# logging.debug("Appended path_transformers {} lines".format(len(clean_lines)))
+# logging.info("Appended path_transformers {} lines".format(len(clean_lines)))
 
 #%% Append all python files to a single script
 
@@ -71,11 +71,11 @@ for k in kernel_files:
             lines = fh.readlines()
         # Concatenate
         script_lines = script_lines + lines
-        logging.debug("Added {:5} lines from {}".format(len(lines),f.stem))
+        logging.info("Added {:5} lines from {}".format(len(lines),f.stem))
 #%%
 with path_kernel_script_out.open('w') as fh:
     fh.writelines(script_lines)
-logging.debug("Wrote {}".format(path_kernel_script_out))
+logging.info("Wrote {}".format(path_kernel_script_out))
 
 #%% Convert to notebook
 # Parse the script to Jupyter format

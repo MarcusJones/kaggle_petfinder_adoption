@@ -21,7 +21,7 @@ logger = logging.getLogger()
 logger.handlers = []
 
 # Set level
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.info)
 
 # Create formatter
 #FORMAT = "%(asctime)s - %(levelno)-3s - %(module)-10s  %(funcName)-10s: %(message)s"
@@ -36,7 +36,7 @@ formatter = logging.Formatter(FORMAT, DATE_FMT)
 handler = logging.StreamHandler(sys.stderr)
 handler.setFormatter(formatter)
 logger.handlers = [handler]
-logging.debug("Logging started")
+logging.info("Logging started")
 
 
 
@@ -52,7 +52,7 @@ if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
 else:
     DEPLOYMENT = 'Local'
-logging.debug("Deployment: {}".format(DEPLOYMENT))
+logging.info("Deployment: {}".format(DEPLOYMENT))
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1

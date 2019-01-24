@@ -7,13 +7,13 @@ df_te = df_all[df_all['dataset_type']=='test'].copy()
 df_te.drop('dataset_type', axis=1, inplace=True)
 
 y_tr = df_tr['AdoptionSpeed']
-logging.debug("y_tr {}".format(y_tr.shape))
+logging.info("y_tr {}".format(y_tr.shape))
 
 X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
-logging.debug("X_tr {}".format(X_tr.shape))
+logging.info("X_tr {}".format(X_tr.shape))
 
 X_te = df_te.drop(['AdoptionSpeed'], axis=1)
-logging.debug("X_te {}".format(X_te.shape))
+logging.info("X_te {}".format(X_te.shape))
 
 #%% DONE HERE - DELETE UNUSED
 print("******************************")

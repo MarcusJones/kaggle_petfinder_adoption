@@ -2,7 +2,7 @@ from pathlib import Path
 import bz2
 from jinja2 import Template
 import logging
-logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.info)
 #%% Collect all imported tools
 # UTILS_DIR = Path('~/kaggle/kaggle_utils/kaggle_utils/').expanduser()
 # TEST_LINES_OUT_DIR = Path('').cwd() / '..' / 'tempdel.txt'
@@ -38,7 +38,7 @@ def bz2_hex_string(path_input):
         ascii_lines = fh.read()
     zipped_lines = bz2.compress(bytes(ascii_lines, 'utf8'))
     hex_string = zipped_lines.hex()
-    logging.debug("Generated size {} hex string from {}".format(len(hex_string), path_input))
+    logging.info("Generated size {} hex string from {}".format(len(hex_string), path_input))
     return hex_string
 
 # def wrap_cell(key, payload_chars):
@@ -98,4 +98,4 @@ with open(TEST_LINES_OUT_DIR, 'w') as fh:
 len(payload)
 with open(TEST_ZIP_OUT_DIR, 'wb') as fh:
     fh.write(payload)
-logging.debug("Wrote {:0.1f}kb to {}".format(len(payload)/1000, TEST_ZIP_OUT_DIR))
+logging.info("Wrote {:0.1f}kb to {}".format(len(payload)/1000, TEST_ZIP_OUT_DIR))
