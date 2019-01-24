@@ -59,7 +59,7 @@ if DEPLOYMENT=='Kaggle':
     import transformers as trf
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    SAMPLE_FRACTION = 0.5
+    SAMPLE_FRACTION = 1
     import kaggle_utils.transformers as trf
 
 

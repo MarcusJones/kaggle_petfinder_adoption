@@ -1,293 +1,3 @@
-#%% TRANSFORMERS
-transfomers_module = r'''
-import sklearn as sk
-import pandas as pd
-import time
-import numpy as np
-import sklearn.preprocessing
-import sklearn.base
-
-#
-def timeit(method):
-    """ Decorator to time execution of transformers
-    :param method:
-    :return:
-    """
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        if 'log_time' in kw:
-            name = kw.get('log_name', method.__name__.upper())
-            kw['log_time'][name] = int((te - ts) * 1000)
-        else:
-            print("\t {} {:2.1f}s".format(method.__name__, (te - ts)))
-        return result
-    return timed
-
-#
-class TransformerLog():
-    """Add a .log attribute for logging
-    """
-    @property
-    def log(self):
-        return "Transformer: {}".format(type(self).__name__)
-
-#==============================================================================
-# Empty
-# ===============================================================================
-class Empty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """An empty transformer
-    """
-
-    def __init__(self):
-        pass
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df):
-        print(self.log)
-        return df
-
-#==============================================================================
-# Imputer1D - Simple Imputer wrapper
-# ===============================================================================
-class Imputer1D(sk.preprocessing.Imputer):
-    """
-    A simple wrapper class on Imputer to avoid having to make a single column 2D.
-    """
-    def fit(self, X, y=None):
-        if X.ndim == 1:
-            X = np.expand_dims(X, axis=1)
-        # Call the Imputer as normal, return result
-        return super(Imputer1D, self).fit(X, y=None)
-
-    def transform(self, X, y=None):
-        if X.ndim == 1:
-            X = np.expand_dims(X, axis=1)
-            # Call the Imputer as normal, return result
-        return super(Imputer1D, self).transform(X)
-
-#
-class MultipleToNewFeature(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
-    """
-    def __init__(self, selected_cols, new_col_name,func):
-        self.selected_cols = selected_cols
-        self.new_col_name = new_col_name
-        self.func = func
-
-    def fit(self, X, y=None):
-        return self
-    @timeit
-    def transform(self, df, y=None):
-        # print(df)
-        df[self.new_col_name] = df.apply(self.func, axis=1)
-        print(self.log, "{}({}) -> ['{}']".format(self.func.__name__,self.selected_cols,self.new_col_name))
-        return df
-
-#==============================================================================
-# NumericalToCat - DataFrameMapper only!
-# ===============================================================================
-class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """Convert numeric indexed column into dtype category with labels
-    Convert a column which has a category, presented as an Integer
-    Initialize with a dict of ALL mappings for this session, keyed by column name
-    (This could be easily refactored to have only the required mapping)
-    """
-    def __init__(self,label_map_dict):
-        self.label_map_dict = label_map_dict
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, this_series):
-        assert type(this_series) == pd.Series
-        assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.Name)
-        return_series = this_series.copy()
-        return_series = return_series.astype('category')
-        return_series.cat.rename_categories(self.label_map_dict[return_series.name], inplace=True)
-        print(self.log, return_series.cat.categories)
-
-        assert return_series.dtype == 'category'
-        return return_series
-
-# r  = df_trf.Vaccinated
-# r = r.astype('category')
-# r.cat.rename_categories(label_maps['Vaccinated'],inplace=True)
-
-# train['FurLength'] = train['FurLength'].astype('category')
-# train['FurLength'].cat.rename_categories(map_FurLength,inplace=True)
-
-#==============================================================================
-# WordCounter
-# ===============================================================================
-class WordCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """ Count the words in the input column
-    """
-    def __init__(self, col_name, new_col_name):
-        self.col_name = col_name
-        self.new_col_name = new_col_name
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df, y=None):
-        new_col = df[self.col_name].apply(lambda x: len(x.split(" ")))
-        df[self.new_col_name] = new_col
-        print(self.log, self.new_col_name)
-        return df
-
-# =============================================================================
-# ConvertToDatetime
-# ===============================================================================
-class ConvertToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
-    """
-
-    def __init__(self, time_col_name, unit='s'):
-        self.time_col_name = time_col_name
-        self.unit = unit
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df, y=None):
-        df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], unit=self.unit)
-        print("Transformer:", type(self).__name__, "converted", self.time_col_name, "to dt")
-        return df
-
-# =============================================================================
-# TimeProperty
-# ===============================================================================
-class TimeProperty(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
-    """
-    def __init__(self, time_col_name, new_col_name, time_property):
-        """
-
-        :param time_col_name: Source column, MUST BE A datetime TYPE!
-        :param new_col_name: New column name
-        :param time_property: hour, month, dayofweek
-        """
-        self.time_col_name = time_col_name
-        self.new_col_name = new_col_name
-        self.time_property = time_property
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df, y=None):
-        original_shape = df.shape
-        if self.time_property == 'hour':
-            df[self.new_col_name] = df[self.time_col_name].dt.hour
-        elif self.time_property == 'month':
-            df[self.new_col_name] = df[self.time_col_name].dt.month
-        elif self.time_property == 'dayofweek':
-            df[self.new_col_name] = df[self.time_col_name].dayofweek
-        else:
-            raise
-        print("Transformer:", type(self).__name__, original_shape, "->", df.shape, vars(self))
-        return df
-# Debug:
-# df = X_train
-# time_col_name = 'question_utc'
-# new_col_name = 'question_hour'
-# time_property = 'hour'
-# time_col_name = 'question_utc'
-# new_col_name = 'question_month'
-# time_property = 'month'
-# time_adder = TimeProperty(time_col_name,new_col_name,time_property)
-# res=time_adder.transform(df)
-
-# =============================================================================
-# DEPRECIATED - AnswerDelay
-# ===============================================================================
-class AnswerDelay(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """ Used once, not general, gets time elapsed
-    """
-
-    def __init__(self, new_col_name, divisor=1):
-        self.new_col_name = new_col_name
-        self.divisor = divisor
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df, y=None):
-        df[self.new_col_name] = df['answer_utc'] - df['question_utc']
-        df[self.new_col_name] = df[self.new_col_name].dt.seconds / self.divisor
-        print(self.log)
-        return df
-
-
-# Debug:
-# df = X_train
-# new_col_name = 'answer_delay_seconds'
-# answer_delay_adder = AnswerDelay(new_col_name)
-# res=answer_delay_adder.transform(df)
-
-# =============================================================================
-# ValueCounter
-# ===============================================================================
-class ValueCounter(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """??
-    """
-
-    def __init__(self, col_name):
-        self.col_name = col_name
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, df, y=None):
-        # Count the number of unique entries in a column
-        # reset_index() is used to maintain the DataFrame for merging
-        selected_df_col = df[self.col_name].value_counts().reset_index()
-        # Create a new name for this column
-        selected_df_col.columns = [self.col_name, self.col_name + '_counts']
-        print(self.log)
-        return pd.merge(selected_df_col, df, on=self.col_name)
-
-#=============================================================================
-# DEPRECIATED ConvertDoubleColToDatetime
-# ===============================================================================
-class ConvertDoubleColToDatetime(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-    """
-    """
-
-    # pd.options.mode.chained_assignment = None  # default='warn'
-    def __init__(self, new_col_name, name_col1, name_col2, this_format):
-        self.new_col_name = new_col_name
-        self.name_col1 = name_col1
-        self.name_col2 = name_col2
-        self.this_format = this_format
-
-    def fit(self, X, y=None):
-        return self
-
-    @timeit
-    def transform(self, df, y=None):
-        combined_date_string_series = df.loc[:, self.name_col1] + " " + df.loc[:, self.name_col2]
-        with ChainedAssignment():
-            df.loc[:, self.new_col_name] = pd.to_datetime(combined_date_string_series, format=self.this_format)
-        #        pd.options.mode.chained_assignment = 'warn'  # default='warn'
-
-        # print("Transformer:", type(self).__name__, "converted", self.new_col_name, "to dt")
-        print(self.log)
-        return df
-
-# Debug:
-# df = sfpd_head
-# new_col_name = 'dt'
-# time_adder = ConvertDoubleColToDatetime(new_col_name,name_col1="Date", name_col2="Time",this_format=r'%m/%d/%Y %H:%M')
-# res=time_adder.transform(df)'''
-#%%
-from pathlib import Path
-util_outpath = Path.cwd() / 'transformers.py'
-with util_outpath.open('w') as fh: fh.writelines(transfomers_module)
-print('*** Wrote {}'.format(util_outpath))#%%
 #%%
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
@@ -349,7 +59,7 @@ if DEPLOYMENT=='Kaggle':
     import transformers as trf
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    SAMPLE_FRACTION = 0.5
+    SAMPLE_FRACTION = 1
     import kaggle_utils.transformers as trf
 
 
@@ -373,13 +83,17 @@ import zipfile
 from datetime import datetime
 import gc
 import time
+from pprint import pprint
 
 #%% ===========================================================================
 # ML imports
 # =============================================================================
 import numpy as np
+print('numpy', np.__version__)
 import pandas as pd
+print('pandas', pd.__version__)
 import sklearn as sk
+print('sklearn', sk.__version__)
 
 import sklearn.preprocessing
 import sklearn.model_selection
@@ -392,8 +106,12 @@ from sklearn_pandas import DataFrameMapper
 
 # Models
 import lightgbm as lgb
+print("lightgbm", lgb.__version__)
 import xgboost as xgb
+print("xgboost", xgb.__version__)
 from catboost import CatBoostClassifier
+import catboost as catb
+print("catboost", catb.__version__)
 
 # Metric
 from sklearn.metrics import cohen_kappa_score
@@ -409,7 +127,60 @@ import seaborn as sns
 # =============================================================================
 
 
-
+#%% DEBUG TRF
+#
+# class TransformerLog():
+#     """Add a .log attribute for logging
+#     """
+#     @property
+#     def log(self):
+#         return "Transformer: {}".format(type(self).__name__)
+# class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
+#     """Convert numeric indexed column into dtype category with labels
+#     Convert a column which has a category, presented as an Integer
+#     Initialize with a dict of ALL mappings for this session, keyed by column name
+#     (This could be easily refactored to have only the required mapping)
+#     """
+#     def __init__(self,label_map):
+#         self.label_map = label_map
+#
+#     def fit(self, X, y=None):
+#         return self
+#
+#     def transform(self, this_series):
+#         assert type(this_series) == pd.Series
+#         mapped_labels = list(self.label_map.values())
+#         # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.Name)
+#         return_series = this_series.copy()
+#         return_series = pd.Series(pd.Categorical.from_codes(this_series, mapped_labels))
+#         # return_series = return_series.astype('category')
+#         # return_series.cat.rename_categories(self.label_map_dict[return_series.name], inplace=True)
+#         print(self.log, mapped_labels, return_series.cat.categories, )
+#         assert return_series.dtype == 'category'
+#         return return_series
+#
+# # this_series = df_all['Vaccinated'].copy()
+# # this_series.value_counts()
+# # label_map = label_maps['Vaccinated']
+# # mapped_labels = list(label_map.values())
+# # my_labels = pd.Index(mapped_labels)
+# # pd.Series(pd.Categorical.from_codes(this_series, my_labels))
+#
+# for col_name in label_maps:
+#     df_all[col_name].value_counts().index
+#     print(col_name)
+#     label_maps[col_name]
+#     df_all.replace({col_name: label_maps[col_name]},inplace=True)
+#
+#
+#
+# df_all['Vaccinated'] = df_all['Vaccinated'] - 1
+#
+# pandas.CategoricalIndex.reorder_categories
+#
+# # To return the original integer mapping!
+# ivd = {v: k for k, v in label_maps['State'].items()}
+# df_all['State'].astype('object').replace(ivd)
 #%% ===========================================================================
 # Data source and paths
 # =============================================================================
@@ -429,7 +200,9 @@ logging.info(f"Loading files into memory")
 #     df_test = pd.read_csv(f, delimiter=',')
 
 df_train = pd.read_csv(path_data / 'train'/ 'train.csv')
+df_train.set_index(['PetID'],inplace=True)
 df_test = pd.read_csv(path_data / 'test' / 'test.csv')
+df_test.set_index(['PetID'],inplace=True)
 
 breeds = pd.read_csv(path_data / "breed_labels.csv")
 colors = pd.read_csv(path_data / "color_labels.csv")
@@ -442,9 +215,13 @@ logging.debug("Loaded test {}".format(df_test.shape))
 df_train['dataset_type'] = 'train'
 df_test['dataset_type'] = 'test'
 
+# Set this aside for debugging
+#TODO: Remove later
+original_y_train = df_train['AdoptionSpeed'].copy()
+
 logging.debug("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)
-df_all.set_index('PetID',inplace=True)
+# df_all.set_index('PetID',inplace=True)
 
 del df_train, df_test
 
@@ -547,9 +324,54 @@ logging.debug("Category mappings for {} columns created".format(len(label_maps))
 for map in label_maps:
     print(map, label_maps[map])
 
-#%% Dynamically create the transformation definitions
-tx_definitions = [(col_name, trf.NumericalToCat(label_maps)) for col_name in label_maps]
 
+# %%
+class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin):
+    """Convert numeric indexed column into dtype category with labels
+    Convert a column which has a category, presented as an Integer
+    Initialize with a dict of ALL mappings for this session, keyed by column name
+    (This could be easily refactored to have only the required mapping)
+    """
+
+    def __init__(self, label_map_dict, allow_more_labels=False):
+        self.label_map_dict = label_map_dict
+        self.allow_more_labels = allow_more_labels
+
+    def fit(self, X, y=None):
+        return self
+
+    def get_unique_values(self, this_series):
+        return list(this_series.value_counts().index)
+
+    def transform(self, this_series):
+        if not self.allow_more_labels:
+            if len(self.label_map_dict) > len(this_series.value_counts()):
+                msg = "{} labels provided, but {} values in column!\nLabels:{}\nValues:{}".format(
+                    len(self.label_map_dict), len(this_series.value_counts()), self.label_map_dict,
+                    self.get_unique_values(this_series), )
+                raise ValueError(msg)
+
+        if len(self.label_map_dict) < len(this_series.value_counts()):
+            raise ValueError
+
+        assert type(this_series) == pd.Series
+        # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.name)
+        return_series = this_series.copy()
+        # return_series = pd.Series(pd.Categorical.from_codes(this_series, self.label_map_dict))
+        return_series = return_series.astype('category')
+        return_series.cat.rename_categories(self.label_map_dict, inplace=True)
+        # print(return_series.cat.categories)
+
+        assert return_series.dtype == 'category'
+        return return_series
+
+
+#%% Dynamically create the transformation definitions
+# tx_definitions_preview = [(col_name, label_maps[col_name]) for col_name in label_maps]
+# for t in tx_definitions_preview:
+#     print(t)
+tx_definitions = [(col_name, NumericalToCat(label_maps[col_name], True)) for col_name in label_maps]
+# col_name = 'Vaccinated'
 #%% Pipeline
 # Build the pipeline
 # NOTES:
@@ -558,22 +380,23 @@ tx_definitions = [(col_name, trf.NumericalToCat(label_maps)) for col_name in lab
 # default - if a column is not transformed, keep it unchanged!
 # WARNINGS:
 # The categorical dtype is LOST!
+# The mapping does NOT match the original!
 # Do NOT use DataFrameMapper for creating new columns, use a regular pipeline!
 data_mapper = DataFrameMapper(
     tx_definitions,
 input_df=True, df_out=True, default=None)
+logging.debug("Categorical transformer pipeline warnings, see docstring!".format())
 
-print("DataFrameMapper, applies transforms directly selected columns")
-for i, step in enumerate(data_mapper.features):
-    print(i, step)
+# print("DataFrameMapper, applies transforms directly selected columns")
+# for i, step in enumerate(data_mapper.features):
+#     print(i, step)
 
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
-
-logging.debug("Size of train df_all with string columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.debug("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
 for col in label_maps:
-    print(col)
+    # print(col)
     df_all[col] = df_all[col].astype('category')
 logging.debug("Reapplied categorical features".format())
 logging.debug("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
@@ -581,7 +404,7 @@ logging.debug("Size of df_all with categorical features: {} MB".format(sys.getsi
 
 #%% SUMMARY
 
-logging.debug("Final df_all {}".format(df_all.shape))
+logging.debug("Final shape of df_all {}".format(df_all.shape))
 #%% DONE HERE - DELETE UNUSED
 print("******************************")
 
@@ -604,6 +427,19 @@ for name in dir():
         del globals()[name]
 logging.info(f"Removed {cnt} variables from memory")
 del cnt, name, del_vars
+# y_train_data = df_all[df_all['dataset_type']=='train']['AdoptionSpeed'].copy()
+#
+# mapped_data = y_train_data.cat.codes
+# mapped_data.value_counts().sort_index(ascending=True)
+# mapped_data.name = 'Mapped'
+# # y_train_data.plot.bar()
+#
+# original_y_train.name = 'Original'
+# original_y_train.value_counts().sort_index(ascending=True)
+#
+# this_df = pd.concat([original_y_train, mapped_data],axis=1)
+# # del y_train_data
+# dict( enumerate(y_train_data.cat.categories) )
 # %% ===========================================================================
 # Feature
 # =============================================================================
@@ -627,7 +463,7 @@ def pure_breed(row):
 
 #%% Build the pipeline
 this_pipeline = sk.pipeline.Pipeline([
-        ('counr', trf.MultipleToNewFeature(['Breed1','Breed2'], 'Pure Breed', pure_breed)),
+        ('feat: Pure Breed', trf.MultipleToNewFeature(['Breed1','Breed2'], 'Pure Breed', pure_breed)),
         ])
 
 logging.info("Created pipeline:")
@@ -738,9 +574,16 @@ df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.debug("Final size of data frame: {}".format(df_all.shape))
 logging.debug("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
-#%%
+# It is necessary to strictly remap the target variable!
+target_col = 'AdoptionSpeed'
+df_all[target_col]
+inverse_map = {v: k for k, v in label_maps[target_col].items()}
+df_all[target_col] = df_all[target_col].astype('object').replace(inverse_map)
+df_all[target_col] = df_all[target_col].fillna(-1).astype('int64')#%%
+
 df_tr = df_all[df_all['dataset_type']=='train'].copy()
 df_tr.drop('dataset_type', axis=1, inplace=True)
+
 df_te = df_all[df_all['dataset_type']=='test'].copy()
 df_te.drop('dataset_type', axis=1, inplace=True)
 
@@ -770,175 +613,121 @@ logging.info(f"Removed {cnt} variables from memory")
 del cnt, name, del_vars
 
 # Train 2 seperate models, one for cats, one for dogs!!
-#%%
-n_fold = 5
-folds = sk.model_selection.StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
+
+assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
+#%% Model and params
+params_model = dict()
+# params['num_class'] = len(y_tr.value_counts())
+params_model.update({
+ 'boosting_type': 'gbdt',
+    'num_leaves': 31,
+    'max_depth': -1,
+    'learning_rate': 0.1,
+    'n_estimators': 100,
+    'subsample_for_bin': 200000,
+    'objective': 'multiclass',
+ 'class_weight': None,
+    'min_split_gain': 0.0,
+    'min_child_weight': 0.001,
+    'min_child_samples': 20,
+    'subsample': 1.0,
+    'subsample_freq': 0,
+ 'colsample_bytree': 1.0,
+    'reg_alpha': 0.0,
+    'reg_lambda': 0.0,
+    'random_state': None,
+    'n_jobs': -1, # -1 is for ALL
+ 'importance_type': 'split',
+ 'silent': True,
+})
+clf = lgb.LGBMClassifier(**params_model,
+
+                         )
+
+#%% GridCV
+params_grid = {
+    'learning_rate': [0.005, 0.05, 0.1, 0.2],
+    # 'n_estimators': [40],
+    # 'num_leaves': [6,8,12,16],
+    # 'boosting_type' : ['gbdt'],
+    # 'objective' : ['binary'],
+    # 'random_state' : [501], # Updated from 'seed'
+    # 'colsample_bytree' : [0.65, 0.66],
+    # 'subsample' : [0.7,0.75],
+    # 'reg_alpha' : [1,1.2],
+    # 'reg_lambda' : [1,1.2,1.4],
+    }
+
+clf_grid = sk.model_selection.GridSearchCV(clf, params_grid,
+                                       verbose=1,
+                                       cv=5,
+                                       n_jobs=-1)
+#%% Fit
+clf_grid.fit(X_tr, y_tr)
+
+# Print the best parameters found
+print("Best score:", clf_grid.best_score_)
+print("Bast parameters:", clf_grid.best_params_)
+
+clf_grid_BEST = clf_grid.best_estimator_
+
+#%% Do the final fit on the BEST estimator
+# start = datetime.datetime.now()
+# predicted = clf_grid_BEST.fit(train_X, train_Y)
+# logging.debug("Elapsed H:m:s: {}".format(datetime.datetime.now()-start))
+
+#%% Predict on Test set
+# NB we only want the defaulters column!
+predicted = clf_grid_BEST.predict(X_te)
+
+#%% Metric
+
+# kappa(target, train_predictions)
+# rmse(target, [r[0] for r in results['train']])
+# submission = pd.DataFrame({'PetID': test_id, 'AdoptionSpeed': test_predictions})
+# submission.head()
+
 
 #%%
-
-def train_model(X, X_test, y, params, folds, model_type, plot_feature_importance=False,
-                averaging='usual', make_oof=False):
-
-    logging.debug("Starting training {}".format(model_type))
-    result_dict = {}
-    if make_oof:
-        oof = np.zeros(len(X))
-    prediction = np.zeros(len(X_test))
-    scores = []
-    feature_importance = pd.DataFrame()
-    for fold_n, (train_index, valid_index) in enumerate(folds.split(X, y)):
-        gc.collect()
-        print('Fold', fold_n + 1, 'started at', time.ctime())
-        X_train, X_valid = X.iloc[train_index], X.iloc[valid_index]
-        y_train, y_valid = y.iloc[train_index], y.iloc[valid_index]
-
-        if model_type == 'lgb':
-            # logging.debug("Categorical column selection here!! TODO: NB".format())
-            # cat_cols = X.columns.to_list
-            # X_tr.columns.to_list()
-
-            train_data = lgb.Dataset(X_train, label=y_train)
-            valid_data = lgb.Dataset(X_valid, label=y_valid)
-
-            model = lgb.train(params,
-                              train_data,
-                              num_boost_round=2000,
-                              valid_sets=[train_data, valid_data],
-                              verbose_eval=100,
-                              early_stopping_rounds=200)
-
-            del train_data, valid_data
-
-            y_pred_valid = model.predict(X_valid, num_iteration=model.best_iteration).argmax(1)
-            del X_valid
-            gc.collect()
-            y_pred = model.predict(X_test, num_iteration=model.best_iteration).argmax(1)
-
-        if model_type == 'xgb':
-            train_data = xgb.DMatrix(data=X_train, label=y_train)
-            valid_data = xgb.DMatrix(data=X_valid, label=y_valid)
-
-            watchlist = [(train_data, 'train'), (valid_data, 'valid_data')]
-            model = xgb.train(dtrain=train_data, num_boost_round=20000, evals=watchlist, early_stopping_rounds=200,
-                              verbose_eval=500, params=params)
-            y_pred_valid = model.predict(xgb.DMatrix(X_valid), ntree_limit=model.best_ntree_limit)
-            y_pred = model.predict(xgb.DMatrix(X_test), ntree_limit=model.best_ntree_limit)
-
-        if model_type == 'lcv':
-            model = LogisticRegressionCV(scoring='neg_log_loss', cv=3, multi_class='multinomial')
-            model.fit(X_train, y_train)
-
-            y_pred_valid = model.predict(X_valid)
-            y_pred = model.predict(X_test)
-
-        if model_type == 'cat':
-            model = CatBoostClassifier(iterations=20000, loss_function='MultiClass', **params)
-            model.fit(X_train, y_train, eval_set=(X_valid, y_valid), cat_features=[], use_best_model=True,
-                      verbose=False)
-
-            y_pred_valid = model.predict(X_valid)
-            y_pred = model.predict(X_test).reshape(-1, )
-
-        if make_oof:
-            oof[valid_index] = y_pred_valid.reshape(-1, )
-
-        scores.append(kappa(y_valid, y_pred_valid))
-        print('Fold kappa:', kappa(y_valid, y_pred_valid))
-        print('')
-
-        if averaging == 'usual':
-            prediction += y_pred
-        elif averaging == 'rank':
-            prediction += pd.Series(y_pred).rank().values
-
-        if model_type == 'lgb':
-            # feature importance
-            fold_importance = pd.DataFrame()
-            fold_importance["feature"] = X.columns
-            fold_importance["importance"] = model.feature_importance()
-            fold_importance["fold"] = fold_n + 1
-            feature_importance = pd.concat([feature_importance, fold_importance], axis=0)
-
-    prediction /= n_fold
-
-    print('CV mean score: {0:.4f}, std: {1:.4f}.'.format(np.mean(scores), np.std(scores)))
-
-    if model_type == 'lgb':
-
-        if plot_feature_importance:
-            feature_importance["importance"] /= n_fold
-            cols = feature_importance[["feature", "importance"]].groupby("feature").mean().sort_values(
-                by="importance", ascending=False)[:50].index
-
-            best_features = feature_importance.loc[feature_importance.feature.isin(cols)]
-
-            # plt.figure(figsize=(16, 12));
-            # sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False));
-            # plt.title('LGB Features (avg over folds)');
-
-            result_dict['feature_importance'] = feature_importance
-
-    result_dict['prediction'] = prediction
-    if make_oof:
-        result_dict['oof'] = oof
-
-    return result_dict
+# n_fold = 5
+# folds = sk.model_selection.StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=15)
 #
-
-#%%
-params = {'num_leaves': 128,
-        #  'min_data_in_leaf': 60,
-         'objective': 'multiclass',
-         'max_depth': -1,
-         'learning_rate': 0.05,
-         "boosting": "gbdt",
-         "feature_fraction": 0.9,
-         "bagging_freq": 3,
-         "bagging_fraction": 0.9,
-         "bagging_seed": 11,
-        #  "lambda_l1": 0.1,
-         # "lambda_l2": 0.1,
-         "random_state": 42,
-         "verbosity": -1,
-         "num_class": 5}
-
-#%%
-
-# X_tr.info()
-# y_tr.astype('int')
-# y_tr.dtype
-# y_factors = y_tr.factorize()[0]
-y_integers = y_tr.cat.codes
-result_dict_lgb = train_model(X=X_tr,
-                              X_test=X_te,
-                              y=y_integers,
-                              params=params,
-                              folds=folds,
-                              model_type='lgb',
-                              plot_feature_importance=True,
-                              make_oof=True)
-
-
-#%% RESULTS
-# r = result_dict_lgb['feature_importance']
-
-# cols = result_dict_lgb['feature_importance'][["feature", "importance"]].groupby("feature").mean().sort_values(
-#                 by="importance", ascending=False)[:50].index
+# for fold_n, (train_indices, valid_indices) in enumerate(folds.split(X_tr, y_tr)):
+#     logging.debug("Fold {:<4} {:0.2f}|{:0.2f}% started {}".format(fold_n,
+#                                                        100*len(train_indices)/len(X_tr),
+#                                                        100*len(valid_indices)/len(X_tr),
+#                                                                   time.ctime()))
+#     gc.collect()
+#     X_tr_fold, X_val_fold = X_tr.iloc[train_indices], X_tr.iloc[valid_indices]
+#     y_tr_fold, y_val_fold = y_tr.iloc[train_indices], y_tr.iloc[valid_indices]
 #
-# best_features = result_dict_lgb['feature_importance'].loc[result_dict_lgb['feature_importance'].feature.isin(cols)]
+#     ds_tr_fold = lgb.Dataset(X_tr_fold, label=y_tr_fold)
+#     ds_val_data = lgb.Dataset(X_val_fold, label=y_val_fold)
 #
-# p = plt.figure(figsize=(16, 12))
-# sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
-# plt.title('LGB Features (avg over folds)')
-# plt.show()#%% Open the submission
+#
+#     pprint(model.get_params())
+#     logging.debug("Model instantiated".format())
+#
+#
+#     # model = lgb.train(params,
+#     #                   ds_tr_fold,
+#     #                   num_boost_round=2000,
+#     #                   valid_sets=[ds_tr_fold, ds_val_data],
+#     #                   verbose_eval=100,
+#     #                   early_stopping_rounds=200)
+#
+#         grid = sk.model_selection.GridSearchCV(mdl, gridParams,
+#                             verbose=0,
+#                             cv=4,
+#                             n_jobs=2)
+#%% Open the submission
 # with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
 #     df_submission = pd.read_csv(f, delimiter=',')
 df_submission = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimiter=',')
 
 
 #%% Collect predicitons
-prediction = (result_dict_lgb['prediction'])
-submission = pd.DataFrame({'PetID': df_submission.PetID, 'AdoptionSpeed': [int(i) for i in prediction]})
+submission = pd.DataFrame({'PetID': df_submission.PetID, 'AdoptionSpeed': [int(i) for i in predicted]})
 submission.head()
 
 #%% Create csv

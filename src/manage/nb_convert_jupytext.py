@@ -59,9 +59,9 @@ script_lines = list()
 
 
 
-
-script_lines = script_lines + clean_lines
-logging.debug("Appended path_transformers {} lines".format(len(clean_lines)))
+#
+# script_lines = script_lines + clean_lines
+# logging.debug("Appended path_transformers {} lines".format(len(clean_lines)))
 
 #%% Append all python files to a single script
 

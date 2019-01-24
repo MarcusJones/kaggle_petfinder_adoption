@@ -64,19 +64,15 @@ clf_grid_BEST = clf_grid.best_estimator_
 
 #%% Predict on Test set
 # NB we only want the defaulters column!
-start = datetime.datetime.now()
 predicted = clf_grid_BEST.predict(X_te)
-logging.debug("Elapsed H:m:s: {}".format(datetime.datetime.now()-start))
+
 #%% Metric
 
 # kappa(target, train_predictions)
 # rmse(target, [r[0] for r in results['train']])
 # submission = pd.DataFrame({'PetID': test_id, 'AdoptionSpeed': test_predictions})
 # submission.head()
-#%% Submission
 
-submission = pd.DataFrame({'PetID': sub.PetID, 'AdoptionSpeed': [int(i) for i in predicted]})
-submission.head()
 
 #%%
 # n_fold = 5

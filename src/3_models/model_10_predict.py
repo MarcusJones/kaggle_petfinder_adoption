@@ -5,8 +5,7 @@ df_submission = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimi
 
 
 #%% Collect predicitons
-prediction = (result_dict_lgb['prediction'])
-submission = pd.DataFrame({'PetID': df_submission.PetID, 'AdoptionSpeed': [int(i) for i in prediction]})
+submission = pd.DataFrame({'PetID': df_submission.PetID, 'AdoptionSpeed': [int(i) for i in predicted]})
 submission.head()
 
 #%% Create csv
