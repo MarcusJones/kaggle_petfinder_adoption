@@ -21,7 +21,7 @@ logger = logging.getLogger()
 logger.handlers = []
 
 # Set level
-logger.setLevel(logging.info)
+logger.setLevel(logging.INFO)
 
 # Create formatter
 #FORMAT = "%(asctime)s - %(levelno)-3s - %(module)-10s  %(funcName)-10s: %(message)s"
@@ -43,6 +43,7 @@ logging.info("Logging started")
 #%%
 import os
 from pathlib import Path
+import importlib.util
 # %% Globals
 #
 # LANDSCAPE_A3 = (16.53, 11.69)
@@ -59,8 +60,11 @@ if DEPLOYMENT=='Kaggle':
     import transformers as trf
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    SAMPLE_FRACTION = 1
+    PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
+    logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
+    sys.path.append(PATH_KAGGLE_UTILS)
     import kaggle_utils.transformers as trf
+    SAMPLE_FRACTION = 1
 
 
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
@@ -109,7 +113,7 @@ import lightgbm as lgb
 print("lightgbm", lgb.__version__)
 import xgboost as xgb
 print("xgboost", xgb.__version__)
-from catboost import CatBoostClassifier
+# from catboost import CatBoostClassifier
 import catboost as catb
 print("catboost", catb.__version__)
 
