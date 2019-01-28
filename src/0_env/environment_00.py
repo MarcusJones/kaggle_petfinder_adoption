@@ -105,6 +105,7 @@ import sklearn.metrics
 import sklearn.linear_model
 import sklearn.pipeline
 import sklearn.model_selection
+import sklearn.ensemble
 
 from sklearn_pandas import DataFrameMapper
 

@@ -6,7 +6,7 @@ Use this script to convert all *.py files to jupyter notebook format
 from pathlib import Path
 import jupytext
 import logging
-logging.getLogger().setLevel(logging.info)
+logging.getLogger().setLevel(logging.INFO)
 import shutil
 from pprint import pprint
 #%%
