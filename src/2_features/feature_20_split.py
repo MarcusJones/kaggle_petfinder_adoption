@@ -2,21 +2,25 @@
 
 df_tr = df_all[df_all['dataset_type']=='train'].copy()
 df_tr.drop('dataset_type', axis=1, inplace=True)
+logging.info("Split off train set {}, {:.1%} of the records".format(df_tr.shape,len(df_tr)/len(df_all)))
 
 df_te = df_all[df_all['dataset_type']=='test'].copy()
 df_te.drop('dataset_type', axis=1, inplace=True)
+logging.info("Split off test set {}, {:.1%} of the records".format(df_tr.shape,len(df_te)/len(df_all)))
 
-y_tr = df_tr['AdoptionSpeed']
-logging.info("y_tr {}".format(y_tr.shape))
+target_col = 'AdoptionSpeed'
+y_tr = df_tr[target_col]
+logging.info("Split off y_tr {}".format(len(y_tr)))
 
+# Drop the target
 X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
-logging.info("X_tr {}".format(X_tr.shape))
+logging.info("Split off X_tr {}".format(X_tr.shape))
 
+# Drop the target (it's NaN anyways)
 X_te = df_te.drop(['AdoptionSpeed'], axis=1)
-logging.info("X_te {}".format(X_te.shape))
+logging.info("Split off X_te {}".format(X_te.shape))
 
 #%% DONE HERE - DELETE UNUSED
-print("******************************")
 
 del_vars =[
     'df_all',

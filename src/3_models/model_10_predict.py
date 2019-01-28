@@ -1,3 +1,8 @@
+#%% Predict on Test set
+# NB we only want the defaulters column!
+predicted = clf_grid_BEST.predict(X_te)
+
+
 #%% Open the submission
 # with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
 #     df_submission = pd.read_csv(f, delimiter=',')

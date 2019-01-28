@@ -27,7 +27,6 @@ params_model.update({
  'silent': True,
 })
 clf = lgb.LGBMClassifier(**params_model,
-
                          )
 
 #%% GridCV
@@ -57,14 +56,17 @@ print("Bast parameters:", clf_grid.best_params_)
 
 clf_grid_BEST = clf_grid.best_estimator_
 
+#%% Predict on X_tr for comparison
+y_tr_predicted = clf_grid_BEST.predict(X_tr)
+
+train_kappa = kappa(y_tr,y_tr_predicted)
+
+logging.info("Metric on training set: {:0.3f}".format(train_kappa))
+
 #%% Do the final fit on the BEST estimator
 # start = datetime.datetime.now()
 # predicted = clf_grid_BEST.fit(train_X, train_Y)
 # logging.info("Elapsed H:m:s: {}".format(datetime.datetime.now()-start))
-
-#%% Predict on Test set
-# NB we only want the defaulters column!
-predicted = clf_grid_BEST.predict(X_te)
 
 #%% Metric
 
