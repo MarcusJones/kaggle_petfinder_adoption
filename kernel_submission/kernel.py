@@ -182,6 +182,8 @@ logging.info("Size of df_all: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000)
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
+df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].fillna(-1)
+df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].astype('int')
 
 #%% Category Mappings
 label_maps = dict()
@@ -195,6 +197,7 @@ label_maps['Type'] = {
     2:"Cat"
 }
 label_maps['AdoptionSpeed'] = {
+    -1 : "Empty",
     0 : "same day",
     1 : "between 1 and 7 days",
     2 : "between 8 and 30 days",
@@ -387,12 +390,12 @@ cols_to_discard = [
     'Name',
 ]
 
-
 logging.info("Feature selection".format())
 original_columns = df_all.columns
 # col_selection = [col for col in all_columns if col not in cols_to_discard]
 
 df_all.drop(cols_to_discard,inplace=True, axis=1)
+logging.info("Discarded {}".format(cols_to_discard))
 
 logging.info("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
 logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
@@ -403,12 +406,52 @@ df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.info("Final size of data frame: {}".format(df_all.shape))
 logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
-# It is necessary to strictly remap the target variable!
-target_col = 'AdoptionSpeed'
-df_all[target_col]
-inverse_map = {v: k for k, v in label_maps[target_col].items()}
-df_all[target_col] = df_all[target_col].astype('object').replace(inverse_map)
-df_all[target_col] = df_all[target_col].fillna(-1).astype('int64')#%%
+#https://roamanalytics.com/2016/10/28/are-categorical-variables-getting-lost-in-your-random-forests/
+#%%
+import pandas.api.types as ptypes
+encoder_list = list()
+for col in df_all.columns:
+    if ptypes.is_categorical_dtype(df_all[col]):
+        encoder_list.append((col,sk.preprocessing.LabelEncoder()))
+
+    elif ptypes.is_string_dtype(df_all[col]):
+        # encoder_list.append((col,'STR?'))
+        continue
+
+    elif ptypes.is_bool_dtype(df_all[col]):
+        encoder_list.append((col, sk.preprocessing.LabelEncoder()))
+
+    elif ptypes.is_bool_dtype(df_all[col]):
+        encoder_list.append((col,sk.preprocessing.LabelEncoder()))
+
+    elif ptypes.is_int64_dtype(df_all[col]):
+        encoder_list.append((col,None))
+
+    elif ptypes.is_float_dtype(df_all[col]):
+        encoder_list.append((col,None))
+
+    else:
+        print('Skip')
+
+
+trf_cols = list()
+for enc in encoder_list:
+    logging.info("{}".format(enc))
+    trf_cols.append(enc[0])
+
+skipped_cols = set(df_all.columns) - set(trf_cols)
+# print(skipped_cols)
+encoder_list.append(('dataset_type',None))
+#%%
+data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
+# ], input_df=True, df_out=True, default=None)
+
+for step in data_mapper.features:
+    print(step)
+#%%
+df_encoded = data_mapper.fit_transform(df_all.copy())
+df_all = df_encoded
+# df_trf_head = df_all_encoded.head()#%%
 
 df_tr = df_all[df_all['dataset_type']=='train'].copy()
 df_tr.drop('dataset_type', axis=1, inplace=True)
@@ -486,7 +529,36 @@ params_grid = {
     # 'random_state' : [501], # Updated from 'seed'
     # 'colsample_bytree' : [0.65, 0.66],
     # 'subsample' : [0.7,0.75],
-    # 'reg_alpha' : [1,1.2],
+    # 'reg_alpha' : [1#%%
+# The final selection of columns from the main DF
+cols_to_use = ['Type', 'Age', 'Breed1', 'Breed2', 'Gender', 'Color1', 'Color2', 'Color3', 'MaturitySize', 'FurLength',
+               'Vaccinated', 'Dewormed', 'Sterilized', 'Health', 'Quantity', 'Fee', 'State', 'RescuerID', 'VideoAmt',
+               'PhotoAmt', 'AdoptionSpeed', 'No_name', 'Pure_breed', 'health', 'Free',
+               'score', 'magnitude']
+
+cols_to_discard = [
+    'RescuerID',
+    'Description',
+    'Name',
+]
+
+
+logging.info("Feature selection".format())
+original_columns = df_all.columns
+# col_selection = [col for col in all_columns if col not in cols_to_discard]
+
+df_all.drop(cols_to_discard,inplace=True, axis=1)
+
+logging.info("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
+logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+
+logging.info("Record selection (sampling)".format())
+logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
+df_all = df_all.sample(frac=SAMPLE_FRACTION)
+logging.info("Final size of data frame: {}".format(df_all.shape))
+logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+
+,1.2],
     # 'reg_lambda' : [1,1.2,1.4],
     }
 
@@ -497,28 +569,7 @@ clf_grid = sk.model_selection.GridSearchCV(clf, params_grid,
 # Train 2 seperate models, one for cats, one for dogs!!
 
 assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
-#%%
-for col in X_tr()
-data_mapper = DataFrameMapper([
-    ("district", sk.preprocessing.LabelBinarizer()),
-    (["hour"], sk.preprocessing.StandardScaler()),
-    (["weekday"], sk.preprocessing.StandardScaler()),
-    (["dayofyear"], sk.preprocessing.StandardScaler()),
-    (["month"], sk.preprocessing.StandardScaler()),
-    (["year"], sk.preprocessing.StandardScaler()),
-    (["lon"], sk.preprocessing.StandardScaler()),
-    (["lat"], sk.preprocessing.StandardScaler()),
-    ("holiday",  sk.preprocessing.LabelEncoder()),
-    ("corner", sk.preprocessing.LabelEncoder()),
-    ("weekend", sk.preprocessing.LabelEncoder()),
-    ("workhour",  sk.preprocessing.LabelEncoder()),
-    ("sunlight",  sk.preprocessing.LabelEncoder()),
-    ("fri",  sk.preprocessing.LabelEncoder()),
-    ("sat",  sk.preprocessing.LabelEncoder()),
-    ('Category', sk.preprocessing.LabelEncoder()),
-#    ("address", [sk.preprocessing.LabelEncoder(), sk.preprocessing.StandardScaler()]),
-#    ("address", sk.preprocessing.LabelEncoder()),
-], input_df=True, df_out=True, default=None)
+
 
 
 #%% Model and params
