@@ -1,6 +1,8 @@
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
+df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].fillna(-1)
+df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].astype('int')
 
 #%% Category Mappings
 label_maps = dict()
@@ -14,6 +16,7 @@ label_maps['Type'] = {
     2:"Cat"
 }
 label_maps['AdoptionSpeed'] = {
+    -1 : "Empty",
     0 : "same day",
     1 : "between 1 and 7 days",
     2 : "between 8 and 30 days",

@@ -11,12 +11,12 @@ cols_to_discard = [
     'Name',
 ]
 
-
 logging.info("Feature selection".format())
 original_columns = df_all.columns
 # col_selection = [col for col in all_columns if col not in cols_to_discard]
 
 df_all.drop(cols_to_discard,inplace=True, axis=1)
+logging.info("Discarded {}".format(cols_to_discard))
 
 logging.info("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
 logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
