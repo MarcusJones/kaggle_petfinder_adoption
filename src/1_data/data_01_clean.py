@@ -1,8 +1,8 @@
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
-df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].fillna(-1)
-df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].astype('int')
+# df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].fillna(-1)
+# df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].astype('int')
 
 #%% Category Mappings
 label_maps = dict()
@@ -16,7 +16,7 @@ label_maps['Type'] = {
     2:"Cat"
 }
 label_maps['AdoptionSpeed'] = {
-    -1 : "Empty",
+    # -1 : "Empty",
     0 : "same day",
     1 : "between 1 and 7 days",
     2 : "between 8 and 30 days",
@@ -128,12 +128,29 @@ logging.info("Categorical transformer pipeline warnings, see docstring!".format(
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
 logging.info("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Warning: PipeLine returns strings, not categorical! ".format(sys.getsizeof(df_all)/1000/1000))
+
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
+# ordered = ['AdoptionSpeed','MaturitySize','FurLength','Health'] #Actually, most have 'unspecified', which can't be ordered
+ordered_cols = ['AdoptionSpeed']
 for col in label_maps:
-    # print(col)
-    df_all[col] = df_all[col].astype('category')
+    this_labels = sorted(list(label_maps[col].items()), key=lambda tup: tup[0])
+    listed_categories = [tup[1] for tup in this_labels]
+    if col in listed_categories:
+        ordered_flag = True
+    else:
+        ordered_flag = False
+    cat_type = pd.api.types.CategoricalDtype(categories=listed_categories,ordered=True)
+    df_all[col] = df_all[col].astype(cat_type)
+
 logging.info("Reapplied categorical features".format())
 logging.info("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+
+#%%
+# df_all['AdoptionSpeed'].value_counts()
+# ser = df_all['AdoptionSpeed']
+#
+# original_y_train.value_counts()
 
 
 #%% SUMMARY

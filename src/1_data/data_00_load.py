@@ -36,6 +36,7 @@ df_test['dataset_type'] = 'test'
 # Set this aside for debugging
 #TODO: Remove later
 original_y_train = df_train['AdoptionSpeed'].copy()
+original_y_train.value_counts()
 
 logging.info("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)

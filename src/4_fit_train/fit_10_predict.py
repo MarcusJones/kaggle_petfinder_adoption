@@ -1,9 +1,19 @@
+# %% Ensure the target is unchanged
+assert all(y_tr.sort_index() == original_y_train.sort_index())
+
 # %% Predict on X_tr for comparison
 y_tr_predicted = clf_grid_BEST.predict(X_tr)
+
+original_y_train.value_counts()
+# y_tr.cat.codes.value_counts()
+y_tr_predicted.value_counts()
+# y_tr.value_counts()
 
 train_kappa = kappa(y_tr, y_tr_predicted)
 
 logging.info("Metric on training set: {:0.3f}".format(train_kappa))
+these_labels = list(label_maps['AdoptionSpeed'].values())
+sk.metrics.confusion_matrix(y_tr, y_tr_predicted)
 
 #%% Predict on Test set
 # NB we only want the defaulters column!
