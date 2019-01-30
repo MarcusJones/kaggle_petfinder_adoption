@@ -23,7 +23,7 @@ logging.info("Split off X_te {}".format(X_te.shape))
 #%% DONE HERE - DELETE UNUSED
 
 del_vars =[
-    # 'df_all',
+    'df_all',
     'df_tr',
     'df_te',
 ]
