@@ -14,8 +14,7 @@ clf = sk.ensemble.RandomForestClassifier(**params_model )
 
 #%% GridCV
 params_grid = {
-    # 'learning_rate': [0.005, 0.05, 0.1, 0.2],
-    # 'n_estimators': [40],
+    'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)],
     # 'num_leaves': [6,8,12,16],
     # 'boosting_type' : ['gbdt'],
     # 'objective' : ['binary'],

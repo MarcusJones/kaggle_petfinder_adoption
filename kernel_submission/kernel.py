@@ -57,7 +57,8 @@ logging.info("Deployment: {}".format(DEPLOYMENT))
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
-    import transformers as trf
+    # import transformers as trf
+    FLAG_LOAD_TRANSFORMER = True
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
     PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
@@ -65,6 +66,7 @@ if DEPLOYMENT == 'Local':
     sys.path.append(PATH_KAGGLE_UTILS)
     import kaggle_utils.transformers as trf
     SAMPLE_FRACTION = 1
+    FLAG_LOAD_TRANSFORMER = False
 
 
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
@@ -132,6 +134,128 @@ import seaborn as sns
 # =============================================================================
 
 
+#%%
+# This is to work around kaggle kernel's not allowing external modules
+if FLAG_LOAD_TRANSFORMER:
+
+    def timeit(method):
+        """ Decorator to time execution of transformers
+        :param method:
+        :return:
+        """
+
+        def timed(*args, **kw):
+            ts = time.time()
+            result = method(*args, **kw)
+            te = time.time()
+            if 'log_time' in kw:
+                name = kw.get('log_name', method.__name__.upper())
+                kw['log_time'][name] = int((te - ts) * 1000)
+            else:
+                print("\t {} {:2.1f}s".format(method.__name__, (te - ts)))
+            return result
+
+        return timed
+
+    class TransformerLog():
+        """Add a .log attribute for logging
+        """
+
+        @property
+        def log(self):
+            return "Transformer: {}".format(type(self).__name__)
+
+    class MultipleToNewFeature(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
+        """
+        """
+
+        def __init__(self, selected_cols, new_col_name, func):
+            self.selected_cols = selected_cols
+            self.new_col_name = new_col_name
+            self.func = func
+
+        def fit(self, X, y=None):
+            return self
+
+        @timeit
+        def transform(self, df, y=None):
+            # print(dMultipleToNewFeaturef)
+            df[self.new_col_name] = df.apply(self.func, axis=1)
+            print(self.log, "{}({}) -> ['{}']".format(self.func.__name__, self.selected_cols, self.new_col_name))
+            return df
+
+    class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin):
+        """Convert numeric indexed column into dtype category with labels
+        Convert a column which has a category, presented as an Integer
+        Initialize with a dict of ALL mappings for this session, keyed by column name
+        (This could be easily refactored to have only the required mapping)
+        """
+
+        def __init__(self, label_map_dict, allow_more_labels=False):
+            self.label_map_dict = label_map_dict
+            self.allow_more_labels = allow_more_labels
+
+        def fit(self, X, y=None):
+            return self
+
+        def get_unique_values(self, this_series):
+            return list(this_series.value_counts().index)
+
+        def transform(self, this_series):
+            if not self.allow_more_labels:
+                if len(self.label_map_dict) > len(this_series.value_counts()):
+                    msg = "{} labels provided, but {} values in column!\nLabels:{}\nValues:{}".format(
+                        len(self.label_map_dict), len(this_series.value_counts()), self.label_map_dict,
+                        self.get_unique_values(this_series), )
+                    raise ValueError(msg)
+
+            if len(self.label_map_dict) < len(this_series.value_counts()):
+                raise ValueError
+
+            assert type(this_series) == pd.Series
+            # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.name)
+            return_series = this_series.copy()
+            # return_series = pd.Series(pd.Categorical.from_codes(this_series, self.label_map_dict))
+            return_series = return_series.astype('category')
+            return_series.cat.rename_categories(self.label_map_dict, inplace=True)
+            # print(return_series.cat.categories)
+
+            assert return_series.dtype == 'category'
+            return return_series
+
+        def get_unique_values(self, this_series):
+            return list(this_series.value_counts().index)
+
+        def transform(self, this_series):
+            if not self.allow_more_labels:
+                if len(self.label_map_dict) > len(this_series.value_counts()):
+                    msg = "{} labels provided, but {} values in column!\nLabels:{}\nValues:{}".format(
+                        len(self.label_map_dict), len(this_series.value_counts()), self.label_map_dict,
+                        self.get_unique_values(this_series), )
+                    raise ValueError(msg)
+
+            if len(self.label_map_dict) < len(this_series.value_counts()):
+                raise ValueError
+
+            assert type(this_series) == pd.Series
+            # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.name)
+            return_series = this_series.copy()
+            # return_series = pd.Series(pd.Categorical.from_codes(this_series, self.label_map_dict))
+            return_series = return_series.astype('category')
+            return_series.cat.rename_categories(self.label_map_dict, inplace=True)
+            # print(return_series.cat.categories)
+
+            assert return_series.dtype == 'category'
+            return return_series
+
+    # Here we simulate a module namespace
+    class trf:
+        NumericalToCat = NumericalToCat
+        MultipleToNewFeature = MultipleToNewFeature
+        TransformerLog = TransformerLog
+        timeit = timeit
+
+
 
 #%% ===========================================================================
 # Data source and paths
@@ -170,6 +294,7 @@ df_test['dataset_type'] = 'test'
 # Set this aside for debugging
 #TODO: Remove later
 original_y_train = df_train['AdoptionSpeed'].copy()
+original_y_train.value_counts()
 
 logging.info("Added dataset_type column for origin".format())
 df_all = pd.concat([df_train, df_test], sort=False)
@@ -182,8 +307,8 @@ logging.info("Size of df_all: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000)
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
-df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].fillna(-1)
-df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].astype('int')
+# df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].fillna(-1)
+# df_all['AdoptionSpeed'] = df_all['AdoptionSpeed'].astype('int')
 
 #%% Category Mappings
 label_maps = dict()
@@ -197,7 +322,7 @@ label_maps['Type'] = {
     2:"Cat"
 }
 label_maps['AdoptionSpeed'] = {
-    -1 : "Empty",
+    # -1 : "Empty",
     0 : "same day",
     1 : "between 1 and 7 days",
     2 : "between 8 and 30 days",
@@ -309,12 +434,29 @@ logging.info("Categorical transformer pipeline warnings, see docstring!".format(
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
 logging.info("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Warning: PipeLine returns strings, not categorical! ".format(sys.getsizeof(df_all)/1000/1000))
+
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
+# ordered = ['AdoptionSpeed','MaturitySize','FurLength','Health'] #Actually, most have 'unspecified', which can't be ordered
+ordered_cols = ['AdoptionSpeed']
 for col in label_maps:
-    # print(col)
-    df_all[col] = df_all[col].astype('category')
+    this_labels = sorted(list(label_maps[col].items()), key=lambda tup: tup[0])
+    listed_categories = [tup[1] for tup in this_labels]
+    if col in listed_categories:
+        ordered_flag = True
+    else:
+        ordered_flag = False
+    cat_type = pd.api.types.CategoricalDtype(categories=listed_categories,ordered=True)
+    df_all[col] = df_all[col].astype(cat_type)
+
 logging.info("Reapplied categorical features".format())
 logging.info("Size of df_all with categorical features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+
+#%%
+# df_all['AdoptionSpeed'].value_counts()
+# ser = df_all['AdoptionSpeed']
+#
+# original_y_train.value_counts()
 
 
 #%% SUMMARY
@@ -406,52 +548,7 @@ df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.info("Final size of data frame: {}".format(df_all.shape))
 logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
-#https://roamanalytics.com/2016/10/28/are-categorical-variables-getting-lost-in-your-random-forests/
 #%%
-import pandas.api.types as ptypes
-encoder_list = list()
-for col in df_all.columns:
-    if ptypes.is_categorical_dtype(df_all[col]):
-        encoder_list.append((col,sk.preprocessing.LabelEncoder()))
-
-    elif ptypes.is_string_dtype(df_all[col]):
-        # encoder_list.append((col,'STR?'))
-        continue
-
-    elif ptypes.is_bool_dtype(df_all[col]):
-        encoder_list.append((col, sk.preprocessing.LabelEncoder()))
-
-    elif ptypes.is_bool_dtype(df_all[col]):
-        encoder_list.append((col,sk.preprocessing.LabelEncoder()))
-
-    elif ptypes.is_int64_dtype(df_all[col]):
-        encoder_list.append((col,None))
-
-    elif ptypes.is_float_dtype(df_all[col]):
-        encoder_list.append((col,None))
-
-    else:
-        print('Skip')
-
-
-trf_cols = list()
-for enc in encoder_list:
-    logging.info("{}".format(enc))
-    trf_cols.append(enc[0])
-
-skipped_cols = set(df_all.columns) - set(trf_cols)
-# print(skipped_cols)
-encoder_list.append(('dataset_type',None))
-#%%
-data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
-# ], input_df=True, df_out=True, default=None)
-
-for step in data_mapper.features:
-    print(step)
-#%%
-df_encoded = data_mapper.fit_transform(df_all.copy())
-df_all = df_encoded
-# df_trf_head = df_all_encoded.head()#%%
 
 df_tr = df_all[df_all['dataset_type']=='train'].copy()
 df_tr.drop('dataset_type', axis=1, inplace=True)
@@ -476,7 +573,7 @@ logging.info("Split off X_te {}".format(X_te.shape))
 #%% DONE HERE - DELETE UNUSED
 
 del_vars =[
-    'df_all',
+    # 'df_all',
     'df_tr',
     'df_te',
 ]
@@ -488,87 +585,59 @@ for name in dir():
 logging.info(f"Removed {cnt} variables from memory")
 del cnt, name, del_vars
 
-# Train 2 seperate models, one for cats, one for dogs!!
+#https://roamanalytics.com/2016/10/28/are-categorical-variables-getting-lost-in-your-random-forests/
+#%%
+# df_all['AdoptionSpeed'].fillna(-1)
+# a[pd.isnull(a)]
+import pandas.api.types as ptypes
+encoder_list = list()
+for col in X_tr.columns:
+    if ptypes.is_categorical_dtype(X_tr[col]):
+        encoder_list.append((col,sk.preprocessing.LabelEncoder()))
 
-assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
-#%% Model and params
-params_model = dict()
-# params['num_class'] = len(y_tr.value_counts())
-params_model.update({
- 'boosting_type': 'gbdt',
-    'num_leaves': 31,
-    'max_depth': -1,
-    'learning_rate': 0.1,
-    'n_estimators': 100,
-    'subsample_for_bin': 200000,
-    'objective': 'multiclass',
- 'class_weight': None,
-    'min_split_gain': 0.0,
-    'min_child_weight': 0.001,
-    'min_child_samples': 20,
-    'subsample': 1.0,
-    'subsample_freq': 0,
- 'colsample_bytree': 1.0,
-    'reg_alpha': 0.0,
-    'reg_lambda': 0.0,
-    'random_state': None,
-    'n_jobs': -1, # -1 is for ALL
- 'importance_type': 'split',
- 'silent': True,
-})
-clf = lgb.LGBMClassifier(**params_model,
-                         )
+    elif ptypes.is_string_dtype(X_tr[col]):
+        # encoder_list.append((col,'STR?'))
+        continue
 
-#%% GridCV
-params_grid = {
-    'learning_rate': [0.005, 0.05, 0.1, 0.2],
-    # 'n_estimators': [40],
-    # 'num_leaves': [6,8,12,16],
-    # 'boosting_type' : ['gbdt'],
-    # 'objective' : ['binary'],
-    # 'random_state' : [501], # Updated from 'seed'
-    # 'colsample_bytree' : [0.65, 0.66],
-    # 'subsample' : [0.7,0.75],
-    # 'reg_alpha' : [1#%%
-# The final selection of columns from the main DF
-cols_to_use = ['Type', 'Age', 'Breed1', 'Breed2', 'Gender', 'Color1', 'Color2', 'Color3', 'MaturitySize', 'FurLength',
-               'Vaccinated', 'Dewormed', 'Sterilized', 'Health', 'Quantity', 'Fee', 'State', 'RescuerID', 'VideoAmt',
-               'PhotoAmt', 'AdoptionSpeed', 'No_name', 'Pure_breed', 'health', 'Free',
-               'score', 'magnitude']
+    elif ptypes.is_bool_dtype(X_tr[col]):
+        encoder_list.append((col, sk.preprocessing.LabelEncoder()))
 
-cols_to_discard = [
-    'RescuerID',
-    'Description',
-    'Name',
-]
+    elif ptypes.is_bool_dtype(X_tr[col]):
+        encoder_list.append((col,sk.preprocessing.LabelEncoder()))
+
+    elif ptypes.is_int64_dtype(X_tr[col]):
+        encoder_list.append((col,None))
+
+    elif ptypes.is_float_dtype(X_tr[col]):
+        encoder_list.append((col,None))
+
+    else:
+        print('Skip')
 
 
-logging.info("Feature selection".format())
-original_columns = df_all.columns
-# col_selection = [col for col in all_columns if col not in cols_to_discard]
+trf_cols = list()
+for enc in encoder_list:
+    logging.info("{}".format(enc))
+    trf_cols.append(enc[0])
 
-df_all.drop(cols_to_discard,inplace=True, axis=1)
+skipped_cols = set(X_tr.columns) - set(trf_cols)
+# print(skipped_cols)
+# encoder_list.append(('dataset_type',None))
+#%%
+data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
+# ], input_df=True, df_out=True, default=None)
 
-logging.info("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
-logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
+for step in data_mapper.features:
+    print(step)
+#%%
+X_tr = data_mapper.fit_transform(X_tr.copy())
+X_te = data_mapper.fit_transform(X_te.copy())
+logging.info("Encoded X_tr and X_te".format())
+y_tr = y_tr.cat.codes
+logging.info("Reverted target to integers".format())
+# df_trf_head = df_all_encoded.head()# Train 2 seperate models, one for cats, one for dogs!!
 
-logging.info("Record selection (sampling)".format())
-logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
-df_all = df_all.sample(frac=SAMPLE_FRACTION)
-logging.info("Final size of data frame: {}".format(df_all.shape))
-logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
-
-,1.2],
-    # 'reg_lambda' : [1,1.2,1.4],
-    }
-
-clf_grid = sk.model_selection.GridSearchCV(clf, params_grid,
-                                       verbose=1,
-                                       cv=5,
-                                       n_jobs=-1)
-# Train 2 seperate models, one for cats, one for dogs!!
-
-assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
+# assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
 
 
 
@@ -605,12 +674,22 @@ clf_grid.fit(X_tr, y_tr)
 print("Best score:", clf_grid.best_score_)
 print("Bast parameters:", clf_grid.best_params_)
 
-clf_grid_BEST = clf_grid.best_estimator_# %% Predict on X_tr for comparison
+clf_grid_BEST = clf_grid.best_estimator_# %% Ensure the target is unchanged
+assert all(y_tr.sort_index() == original_y_train.sort_index())
+
+# %% Predict on X_tr for comparison
 y_tr_predicted = clf_grid_BEST.predict(X_tr)
+
+# original_y_train.value_counts()
+# y_tr.cat.codes.value_counts()
+# y_tr_predicted.value_counts()
+# y_tr.value_counts()
 
 train_kappa = kappa(y_tr, y_tr_predicted)
 
 logging.info("Metric on training set: {:0.3f}".format(train_kappa))
+# these_labels = list(label_maps['AdoptionSpeed'].values())
+sk.metrics.confusion_matrix(y_tr, y_tr_predicted)
 
 #%% Predict on Test set
 # NB we only want the defaulters column!
