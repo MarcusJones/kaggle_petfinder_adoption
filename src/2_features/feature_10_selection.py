@@ -23,7 +23,7 @@ logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof
 
 logging.info("Record selection (sampling)".format())
 logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
-df_all = df_all.sample(frac=SAMPLE_FRACTION)
+# df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.info("Final size of data frame: {}".format(df_all.shape))
 logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 

@@ -14,13 +14,20 @@ clf = sk.ensemble.RandomForestClassifier(**params_model )
 
 #%% GridCV
 random_grid = {
-    'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)],
+    'n_estimators': [int(x) for x in np.linspace(start = 800, stop = 1500, num = 8)],
     'max_features' : ['auto', 'sqrt'],
-    'max_depth' : [int(x) for x in np.linspace(10, 110, num = 11)] + [None],
+    'max_depth' : [int(x) for x in np.linspace(10, 40, num = 8)] + [None],
     'min_samples_split' : [2, 5, 10],
     'min_samples_leaf' : [1, 2, 4],
-    'bootstrap' : [True, False],
+    'bootstrap' : [True, ],
+    # 'bootstrap' : [True, False],
 }
+
+grid_lengths = [len(key) for key in random_grid.values()]
+grid_size = reduce(lambda x, y: x*y, grid_lengths)
+logging.info("Grid size {}".format(grid_size))
+# Best parameters: {'n_estimators': 1000, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 20, 'bootstrap': True}
+
 clf_grid = sk.model_selection.RandomizedSearchCV(estimator=clf, param_distributions=random_grid,
                                n_iter=50, cv=3, verbose=1, random_state=42, n_jobs=-1)
 

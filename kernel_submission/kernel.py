@@ -90,6 +90,7 @@ from datetime import datetime
 import gc
 import time
 from pprint import pprint
+from functools import reduce
 
 #%% ===========================================================================
 # ML imports
@@ -544,7 +545,7 @@ logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof
 
 logging.info("Record selection (sampling)".format())
 logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
-df_all = df_all.sample(frac=SAMPLE_FRACTION)
+# df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.info("Final size of data frame: {}".format(df_all.shape))
 logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
@@ -574,8 +575,8 @@ logging.info("Split off X_te {}".format(X_te.shape))
 
 del_vars =[
     # 'df_all',
-    'df_tr',
-    'df_te',
+    # 'df_tr',
+    # 'df_te',
 ]
 cnt = 0
 for name in dir():
@@ -629,13 +630,16 @@ data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
 
 for step in data_mapper.features:
     print(step)
+
+X_te.iloc[0]
 #%%
 X_tr = data_mapper.fit_transform(X_tr.copy())
 X_te = data_mapper.fit_transform(X_te.copy())
 logging.info("Encoded X_tr and X_te".format())
 y_tr = y_tr.cat.codes
 logging.info("Reverted target to integers".format())
-# df_trf_head = df_all_encoded.head()# Train 2 seperate models, one for cats, one for dogs!!
+# df_trf_head = df_all_encoded.head()
+X_te.iloc[0]# Train 2 seperate models, one for cats, one for dogs!!
 
 # assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
 
@@ -651,13 +655,20 @@ clf = sk.ensemble.RandomForestClassifier(**params_model )
 
 #%% GridCV
 random_grid = {
-    'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)],
+    'n_estimators': [int(x) for x in np.linspace(start = 800, stop = 1500, num = 8)],
     'max_features' : ['auto', 'sqrt'],
-    'max_depth' : [int(x) for x in np.linspace(10, 110, num = 11)] + [None],
+    'max_depth' : [int(x) for x in np.linspace(10, 40, num = 8)] + [None],
     'min_samples_split' : [2, 5, 10],
     'min_samples_leaf' : [1, 2, 4],
-    'bootstrap' : [True, False],
+    'bootstrap' : [True, ],
+    # 'bootstrap' : [True, False],
 }
+
+grid_lengths = [len(key) for key in random_grid.values()]
+grid_size = reduce(lambda x, y: x*y, grid_lengths)
+logging.info("Grid size {}".format(grid_size))
+# Best parameters: {'n_estimators': 1000, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 20, 'bootstrap': True}
+
 clf_grid = sk.model_selection.RandomizedSearchCV(estimator=clf, param_distributions=random_grid,
                                n_iter=50, cv=3, verbose=1, random_state=42, n_jobs=-1)
 
@@ -670,10 +681,13 @@ clf_grid.fit(X_tr, y_tr)
 
 # Print the best parameters found
 print("Best score:", clf_grid.best_score_)
-print("Bast parameters:", clf_grid.best_params_)
+print("Best parameters:", clf_grid.best_params_)
 
-clf_grid_BEST = clf_grid.best_estimator_# %% Ensure the target is unchanged
+clf_grid_BEST = clf_grid.best_estimator_# %%
+# Ensure the target is unchanged
 assert all(y_tr.sort_index() == original_y_train.sort_index())
+# Ensure the target is unchanged (unshuffled!)
+assert all(y_tr == original_y_train)
 
 # %% Predict on X_tr for comparison
 y_tr_predicted = clf_grid_BEST.predict(X_tr)
@@ -693,16 +707,15 @@ sk.metrics.confusion_matrix(y_tr, y_tr_predicted)
 # NB we only want the defaulters column!
 predicted = clf_grid_BEST.predict(X_te)
 
-
+# raise "Lost the sorting of y!"
 #%% Open the submission
 # with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
 #     df_submission = pd.read_csv(f, delimiter=',')
-df_submission = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimiter=',')
-
+df_submission_template = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimiter=',')
+df_submission = pd.DataFrame({'PetID': df_submission_template.PetID, 'AdoptionSpeed': [int(i) for i in predicted]})
 
 #%% Collect predicitons
-submission = pd.DataFrame({'PetID': df_submission.PetID, 'AdoptionSpeed': [int(i) for i in predicted]})
-submission.head()
+df_submission.head()
 
 #%% Create csv
-submission.to_csv('submission.csv', index=False)
+df_submission.to_csv('submission.csv', index=False)

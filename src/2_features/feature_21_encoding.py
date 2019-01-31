@@ -42,6 +42,8 @@ data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
 
 for step in data_mapper.features:
     print(step)
+
+X_te.iloc[0]
 #%%
 X_tr = data_mapper.fit_transform(X_tr.copy())
 X_te = data_mapper.fit_transform(X_te.copy())
@@ -49,3 +51,4 @@ logging.info("Encoded X_tr and X_te".format())
 y_tr = y_tr.cat.codes
 logging.info("Reverted target to integers".format())
 # df_trf_head = df_all_encoded.head()
+X_te.iloc[0]
