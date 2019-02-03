@@ -66,7 +66,7 @@ if DEPLOYMENT == 'Local':
     sys.path.append(PATH_KAGGLE_UTILS)
     import kaggle_utils.transformers as trf
     SAMPLE_FRACTION = 1
-    FLAG_LOAD_TRANSFORMER = False
+    FLAG_LOAD_TRANSFORMER = True
 
 
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
@@ -109,6 +109,12 @@ import sklearn.linear_model
 import sklearn.pipeline
 import sklearn.model_selection
 import sklearn.ensemble
+import sklearn.feature_extraction
+import sklearn.decomposition
+import sklearn.compose
+# import nltk
+# from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+# from nltk.corpus import stopwords
 
 from sklearn_pandas import DataFrameMapper
 

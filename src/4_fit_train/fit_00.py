@@ -19,4 +19,12 @@ else:
     clf_grid_BEST.fit(X_tr, y_tr)
 #%%
 
+features = X_tr.columns
+importances = clf_grid_BEST.feature_importances_
+indices = np.argsort(importances)
 
+plt.title('Feature Importances')
+plt.barh(range(len(indices)), importances[indices], color='b', align='center')
+plt.yticks(range(len(indices)), [features[i] for i in indices])
+plt.xlabel('Relative Importance')
+plt.show()
