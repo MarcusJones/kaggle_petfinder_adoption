@@ -27,9 +27,9 @@ grid_lengths = [len(key) for key in random_grid.values()]
 grid_size = reduce(lambda x, y: x*y, grid_lengths)
 logging.info("Grid size {}".format(grid_size))
 # Best parameters: {'n_estimators': 1000, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 20, 'bootstrap': True}
-
+# Best parameters: {'n_estimators': 400,  'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 20, 'bootstrap': True}
 clf_grid = sk.model_selection.RandomizedSearchCV(estimator=clf, param_distributions=random_grid,
-                               n_iter=50, cv=3, verbose=1, random_state=42, n_jobs=-1)
+                               n_iter=50, cv=3, verbose=50, random_state=42, n_jobs=-1)
 
 # clf_grid = sk.model_selection.GridSearchCV(clf, params_grid,
 #                                        verbose=1,

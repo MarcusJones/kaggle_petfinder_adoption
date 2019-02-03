@@ -21,8 +21,12 @@ logging.info("Discarded {}".format(cols_to_discard))
 logging.info("Selected {} of {} columns".format(len(df_all.columns),len(original_columns)))
 logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof(df_all)/1000/1000))
 
-logging.info("Record selection (sampling)".format())
-logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
+# logging.info("Record selection (sampling)".format())
+# logging.info("Sampling fraction: {}".format(SAMPLE_FRACTION))
+
+# df_all['dataset_type']=='test'
+
+
 # df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.info("Final size of data frame: {}".format(df_all.shape))
 logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
