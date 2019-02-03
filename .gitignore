@@ -86,3 +86,4 @@ target/
 *.swo
 input/**/*
 input
+kernel_submission/
