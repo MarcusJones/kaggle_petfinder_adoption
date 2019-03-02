@@ -19,19 +19,20 @@ tfv = sk.feature_extraction.text.TfidfVectorizer(min_df=2, max_features=None,
 
 #%%
 # Fit the TFIDF
+logging.info("Fit Transforming the TFIDF".format())
 X = tfv.fit_transform(df_all_cp['Description'])
-print("TFIDF shape:", X.shape)
+logging.info("TFIDF shape: {}".format(X.shape))
 
 #%%
 n_components = 200
 svd = sk.decomposition.TruncatedSVD(n_components=n_components, random_state=42)
+logging.info("Fitting SVD on X".format())
 svd.fit(X)
-# print("Percentage of variance explained by each of the selected components.", svd.explained_variance_ratio_)
-print("SUM Percentage of variance explained by each of the selected components.", svd.explained_variance_ratio_.sum())
+logging.info("SUM Percentage of variance explained by each of the selected components {}".format(svd.explained_variance_ratio_.sum()))
 
 #%%
 X = svd.transform(X)
-print("Truncated to {}".format(X.shape[1]))
+print("Truncated TFIDF to {}".format(X.shape[1]))
 
 #%%
 X_df = pd.DataFrame(X, index=df_all.index, columns=['svd_{}'.format(i) for i in range(200)])

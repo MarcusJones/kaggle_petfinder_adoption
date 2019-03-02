@@ -11,6 +11,7 @@ params_model.update({
 
 })
 clf = sk.ensemble.RandomForestClassifier(**params_model )
+logging.info("Classifier created: {}".format(clf))
 
 #%% GridCV
 n_estimators_steps = 5
@@ -27,7 +28,7 @@ random_grid = {
 
 grid_lengths = [len(key) for key in random_grid.values()]
 grid_size = reduce(lambda x, y: x*y, grid_lengths)
-logging.info("Grid size {}".format(grid_size))
+logging.info("Grid set, size {}".format(grid_size))
 
 N_ITER = 400
 N_ITER = 200
@@ -35,6 +36,7 @@ CV_FOLDS = 3
 CV_FOLDS = 3
 clf_grid = sk.model_selection.RandomizedSearchCV(estimator=clf, param_distributions=random_grid,
                                n_iter=N_ITER, cv=CV_FOLDS, verbose=50, random_state=42, n_jobs=-1)
+
 
 
 logging.info("Total jobs: {}".format(N_ITER*CV_FOLDS))

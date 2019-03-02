@@ -25,25 +25,27 @@ for col in X_tr.columns:
         encoder_list.append((col,None))
 
     else:
-        print('Skip')
+        pass
+        # print('Skip')
 
-
+logging.info("Encoder list: {}".format(len(encoder_list)))
 trf_cols = list()
 for enc in encoder_list:
-    logging.info("{}".format(enc))
+    # logging.info("{}".format(enc))
     trf_cols.append(enc[0])
 
 skipped_cols = set(X_tr.columns) - set(trf_cols)
+logging.info("Skipped columns: {}".format(len(skipped_cols)))
 # print(skipped_cols)
 # encoder_list.append(('dataset_type',None))
 #%%
 data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
 # ], input_df=True, df_out=True, default=None)
 
-for step in data_mapper.features:
-    print(step)
+# for step in data_mapper.features:
+#     print(step)
 
-X_te.iloc[0]
+# X_te.iloc[0]
 #%%
 X_tr = data_mapper.fit_transform(X_tr.copy())
 X_te = data_mapper.fit_transform(X_te.copy())
@@ -51,4 +53,4 @@ logging.info("Encoded X_tr and X_te".format())
 y_tr = y_tr.cat.codes
 logging.info("Reverted target to integers".format())
 # df_trf_head = df_all_encoded.head()
-X_te.iloc[0]
+# X_te.iloc[0]

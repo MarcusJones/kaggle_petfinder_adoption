@@ -20,12 +20,15 @@ sk.metrics.confusion_matrix(y_tr, y_tr_predicted)
 
 #%% Predict on Test set
 # NB we only want the defaulters column!
+logging.info("Predicting on X_te".format())
 predicted = clf_grid_BEST.predict(X_te)
 
 # raise "Lost the sorting of y!"
 #%% Open the submission
 # with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
 #     df_submission = pd.read_csv(f, delimiter=',')
+
+logging.info("Creating submission".format())
 df_submission_template = pd.read_csv(path_data / 'test' / 'sample_submission.csv', delimiter=',')
 df_submission = pd.DataFrame({'PetID': df_submission_template.PetID, 'AdoptionSpeed': [int(i) for i in predicted]})
 
@@ -33,4 +36,5 @@ df_submission = pd.DataFrame({'PetID': df_submission_template.PetID, 'AdoptionSp
 df_submission.head()
 
 #%% Create csv
+logging.info("Saving submission to csv.".format())
 df_submission.to_csv('submission.csv', index=False)
