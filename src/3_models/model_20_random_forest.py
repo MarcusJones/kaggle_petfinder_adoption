@@ -13,10 +13,12 @@ params_model.update({
 clf = sk.ensemble.RandomForestClassifier(**params_model )
 
 #%% GridCV
+n_estimators_steps = 5
+max_depth_steps = 5
 random_grid = {
-    'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)],
+    'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = n_estimators_steps)],
     'max_features' : ['auto', 'sqrt'],
-    'max_depth' : [int(x) for x in np.linspace(10, 110, num = 11)] + [None],
+    'max_depth' : [int(x) for x in np.linspace(10, 110, num = max_depth_steps)] + [None],
     'min_samples_split' : [2, 5, 10],
     'min_samples_leaf' : [1, 2, 4],
     'bootstrap' : [True, ],
@@ -28,10 +30,13 @@ grid_size = reduce(lambda x, y: x*y, grid_lengths)
 logging.info("Grid size {}".format(grid_size))
 
 N_ITER = 400
-CV_FOLDS = 5
+N_ITER = 200
+CV_FOLDS = 3
+CV_FOLDS = 3
 clf_grid = sk.model_selection.RandomizedSearchCV(estimator=clf, param_distributions=random_grid,
                                n_iter=N_ITER, cv=CV_FOLDS, verbose=50, random_state=42, n_jobs=-1)
 
 
 logging.info("Total jobs: {}".format(N_ITER*CV_FOLDS))
 logging.info("Coverage: {:0.1%}".format((N_ITER)/grid_size))
+

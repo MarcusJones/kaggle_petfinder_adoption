@@ -14,11 +14,11 @@ logging.info("Split off y_tr {}".format(len(y_tr)))
 
 # Drop the target
 X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
-logging.info("Split off X_tr {}".format(X_tr.shape))
+logging.info("Split off X_tr, dropped target {}".format(X_tr.shape))
 
 # Drop the target (it's NaN anyways)
 X_te = df_te.drop(['AdoptionSpeed'], axis=1)
-logging.info("Split off X_te {}".format(X_te.shape))
+logging.info("Split off X_te, dropped target {}".format(X_te.shape))
 
 #%% DONE HERE - DELETE UNUSED
 
