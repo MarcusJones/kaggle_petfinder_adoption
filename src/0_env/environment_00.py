@@ -54,27 +54,25 @@ import importlib.util
 # Detect the environment
 if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
+
 elif 'LOCAL_KERNEL' in os.environ:
     DEPLOYMENT = 'Local Kernel'
+
 else:
     DEPLOYMENT = 'Local'
+
+
 logging.info("Deployment: {}".format(DEPLOYMENT))
 
 # Set the environment
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
+    RUN_TYPE = "Simple"
     # import transformers as trf
     FLAG_LOAD_TRANSFORMER = True
+
 elif DEPLOYMENT == 'Local':
-    PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    # PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
-    # logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
-    # sys.path.append(PATH_KAGGLE_UTILS)
-    # import kaggle_utils.transformers as trf
-    SAMPLE_FRACTION = 1
-    FLAG_LOAD_TRANSFORMER = True
-elif DEPLOYMENT == 'Local Kernel':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
     # PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
     # logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
@@ -83,6 +81,18 @@ elif DEPLOYMENT == 'Local Kernel':
     SAMPLE_FRACTION = 1
     CV_FRACTION = 0.2
     FLAG_LOAD_TRANSFORMER = True
+    RUN_TYPE = "Grid Search"
+
+elif DEPLOYMENT == 'Local Kernel':
+    PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
+    # PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
+    # logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
+    # sys.path.append(PATH_KAGGLE_UTILS)
+    # import kaggle_utils.transformers as trf
+    SAMPLE_FRACTION = 0.5
+    CV_FRACTION = 0.2
+    FLAG_LOAD_TRANSFORMER = True
+    RUN_TYPE = "Simple"
 
 
 # PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"

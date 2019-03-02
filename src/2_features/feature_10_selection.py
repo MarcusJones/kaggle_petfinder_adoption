@@ -26,7 +26,7 @@ logging.info("Size of df_all with selected features: {} MB".format(sys.getsizeof
 
 # df_all['dataset_type']=='test'
 
-
+#TODO: NB that this SHUFFLES the dataframe!
 # df_all = df_all.sample(frac=SAMPLE_FRACTION)
 logging.info("Final size of data frame: {}".format(df_all.shape))
 logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all)/1000/1000))
