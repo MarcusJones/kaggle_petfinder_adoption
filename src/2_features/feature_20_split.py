@@ -21,10 +21,10 @@ df_te.drop('dataset_type', axis=1, inplace=True)
 logging.info("Split off test set {}, {:.1%} of the records".format(df_tr.shape,len(df_te)/len(df_all)))
 
 logging.info("DataFrame summary".format())
-logging.info("Training {}".format(df_tr.shape))
+logging.info("\tTraining {}".format(df_tr.shape))
 if CV_FRACTION > 0:
-    logging.info("Cross Validation {}".format(df_cv.shape))
-logging.info("Test {}".format(df_te.shape))
+    logging.info("\tCross Validation {}".format(df_cv.shape))
+logging.info("\tTest {}".format(df_te.shape))
 
 #%%
 logging.info("Splitting into X_ and y_".format())
@@ -32,19 +32,22 @@ logging.info("Splitting into X_ and y_".format())
 target_col = 'AdoptionSpeed'
 y_tr = df_tr[target_col]
 X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
-logging.info("Training X {}, y {}".format(X_tr.shape, y_tr.shape))
 
 #%% Split CV
-y_cv = df_tr[target_col]
-X_cv = df_tr.drop(['AdoptionSpeed'], axis=1)
+y_cv = df_cv[target_col]
+X_cv = df_cv.drop(['AdoptionSpeed'], axis=1)
 logging.info("Cross Validation X {}, y {}".format(X_cv.shape, y_cv.shape))
 
 #%% Split Test
 # Drop the target (it's NaN anyways)
 X_te = df_te.drop(['AdoptionSpeed'], axis=1)
-logging.info("Test X {}".format(X_tr.shape, y_tr.shape))
 
-
+#%%
+logging.info("X/y summary".format())
+logging.info("\tTraining X {}, y {}".format(X_tr.shape, y_tr.shape))
+if CV_FRACTION > 0:
+    logging.info("\tCross Validation X {}, y {}".format(X_cv.shape, y_cv.shape))
+logging.info("\tTest X {}".format(X_te.shape))
 
 
 #%% DONE HERE - DELETE UNUSED

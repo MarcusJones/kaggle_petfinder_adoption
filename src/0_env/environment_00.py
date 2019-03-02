@@ -51,6 +51,13 @@ import importlib.util
 # PORTRAIT_A3 = (11.69, 16.53)
 # LANDSCAPE_A4 = (11.69, 8.27)
 
+
+# Set the environment
+if 0:
+    import os
+    os.environ['LOCAL_KERNEL'] = '1'
+
+
 # Detect the environment
 if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
@@ -68,16 +75,13 @@ logging.info("Deployment: {}".format(DEPLOYMENT))
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
+    CV_FRACTION = 0
     RUN_TYPE = "Simple"
-    # import transformers as trf
     FLAG_LOAD_TRANSFORMER = True
+    RUN_TYPE = "Simple"
 
 elif DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    # PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
-    # logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
-    # sys.path.append(PATH_KAGGLE_UTILS)
-    # import kaggle_utils.transformers as trf
     SAMPLE_FRACTION = 1
     CV_FRACTION = 0.2
     FLAG_LOAD_TRANSFORMER = True
@@ -85,23 +89,13 @@ elif DEPLOYMENT == 'Local':
 
 elif DEPLOYMENT == 'Local Kernel':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    # PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
-    # logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
-    # sys.path.append(PATH_KAGGLE_UTILS)
-    # import kaggle_utils.transformers as trf
     SAMPLE_FRACTION = 0.5
     CV_FRACTION = 0.2
     FLAG_LOAD_TRANSFORMER = True
     RUN_TYPE = "Simple"
 
 
-# PATH_OUT = r"/home/batman/git/hack_sfpd1/Out"
-# PATH_OUT_KDE = r"/home/batman/git/hack_sfpd1/out_kde"
-# PATH_REPORTING = r"/home/batman/git/hack_sfpd1/Reporting"
-# PATH_MODELS = r"/home/batman/git/hack_sfpd4/models"
 # TITLE_FONT = {'fontname': 'helvetica'}
-
-
 # TITLE_FONT_NAME = "Arial"
 # plt.rc('font', family='Helvetica')
 

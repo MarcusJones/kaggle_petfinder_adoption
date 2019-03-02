@@ -48,9 +48,15 @@ data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
 # X_te.iloc[0]
 #%%
 X_tr = data_mapper.fit_transform(X_tr.copy())
-X_te = data_mapper.fit_transform(X_te.copy())
-logging.info("Encoded X_tr and X_te".format())
+logging.info("Encoded X_tr".format())
 y_tr = y_tr.cat.codes
-logging.info("Reverted target to integers".format())
+if CV_FRACTION > 0:
+    X_cv = data_mapper.fit_transform(X_cv.copy())
+    logging.info("Encoded X_cv".format())
+    y_cv = y_cv.cat.codes
+X_te = data_mapper.fit_transform(X_te.copy())
+logging.info("Encoded X_te".format())
+
+logging.info("Reverted targets to integers".format())
 # df_trf_head = df_all_encoded.head()
 # X_te.iloc[0]
