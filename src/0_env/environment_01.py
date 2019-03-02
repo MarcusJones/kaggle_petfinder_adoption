@@ -1,5 +1,9 @@
 #%%
 # This is to work around kaggle kernel's not allowing external modules
+# For local deployment, this is skipped.
+# For kaggle kernel deployment, the transformers and utilities are loaded.
+
+#%%
 if FLAG_LOAD_TRANSFORMER:
 
     def timeit(method):
@@ -29,8 +33,10 @@ if FLAG_LOAD_TRANSFORMER:
         def log(self):
             return "Transformer: {}".format(type(self).__name__)
 
+    #%%
     class MultipleToNewFeature(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
-        """
+        """Given a list of column names, create a new column in the df.
+
         """
 
         def __init__(self, selected_cols, new_col_name, func):
@@ -43,11 +49,11 @@ if FLAG_LOAD_TRANSFORMER:
 
         @timeit
         def transform(self, df, y=None):
-            # print(dMultipleToNewFeaturef)
             df[self.new_col_name] = df.apply(self.func, axis=1)
             print(self.log, "{}({}) -> ['{}']".format(self.func.__name__, self.selected_cols, self.new_col_name))
             return df
 
+    #%%
     class NumericalToCat(sk.base.BaseEstimator, sk.base.TransformerMixin):
         """Convert numeric indexed column into dtype category with labels
         Convert a column which has a category, presented as an Integer
@@ -87,31 +93,6 @@ if FLAG_LOAD_TRANSFORMER:
             assert return_series.dtype == 'category'
             return return_series
 
-        def get_unique_values(self, this_series):
-            return list(this_series.value_counts().index)
-
-        def transform(self, this_series):
-            if not self.allow_more_labels:
-                if len(self.label_map_dict) > len(this_series.value_counts()):
-                    msg = "{} labels provided, but {} values in column!\nLabels:{}\nValues:{}".format(
-                        len(self.label_map_dict), len(this_series.value_counts()), self.label_map_dict,
-                        self.get_unique_values(this_series), )
-                    raise ValueError(msg)
-
-            if len(self.label_map_dict) < len(this_series.value_counts()):
-                raise ValueError
-
-            assert type(this_series) == pd.Series
-            # assert this_series.name in self.label_map_dict, "{} not in label map!".format(this_series.name)
-            return_series = this_series.copy()
-            # return_series = pd.Series(pd.Categorical.from_codes(this_series, self.label_map_dict))
-            return_series = return_series.astype('category')
-            return_series.cat.rename_categories(self.label_map_dict, inplace=True)
-            # print(return_series.cat.categories)
-
-            assert return_series.dtype == 'category'
-            return return_series
-
     # Here we simulate a module namespace
     class trf:
         NumericalToCat = NumericalToCat
@@ -121,8 +102,6 @@ if FLAG_LOAD_TRANSFORMER:
 
 
 #%%
-
-
     class PandasSelector(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
         def __init__(self, columns=None, dtype=None, inverse=False,
                      return_vector=True, name=None):
@@ -176,8 +155,6 @@ if FLAG_LOAD_TRANSFORMER:
                 return x[selected_cols]
 
 #%%
-
-
     class PandasSelector2(sk.base.BaseEstimator, sk.base.TransformerMixin, TransformerLog):
         def __init__(self, columns=None, dtype=None, inverse=False,
                      name=None):

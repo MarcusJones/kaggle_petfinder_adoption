@@ -25,6 +25,7 @@ sklearn-pandas = "*"
 ipykernel = "*"
 ascii-graph = "*"
 jinja2 = "*"
+coloredlogs = "*"
 
 [requires]
 python_version = "3.6"

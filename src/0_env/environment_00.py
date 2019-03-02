@@ -44,16 +44,21 @@ logging.info("Logging started")
 import os
 from pathlib import Path
 import importlib.util
+
 # %% Globals
 #
 # LANDSCAPE_A3 = (16.53, 11.69)
 # PORTRAIT_A3 = (11.69, 16.53)
 # LANDSCAPE_A4 = (11.69, 8.27)
+
+# Detect the environment
 if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
 else:
     DEPLOYMENT = 'Local'
 logging.info("Deployment: {}".format(DEPLOYMENT))
+
+# Set the environment
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
     SAMPLE_FRACTION = 1
@@ -61,10 +66,10 @@ if DEPLOYMENT=='Kaggle':
     FLAG_LOAD_TRANSFORMER = True
 if DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
-    PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
-    logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
-    sys.path.append(PATH_KAGGLE_UTILS)
-    import kaggle_utils.transformers as trf
+    # PATH_KAGGLE_UTILS = Path(r"../../../kaggle_utils/kaggle_utils").absolute().resolve()
+    # logging.info("PATH_KAGGLE_UTILS={}".format(PATH_KAGGLE_UTILS))
+    # sys.path.append(PATH_KAGGLE_UTILS)
+    # import kaggle_utils.transformers as trf
     SAMPLE_FRACTION = 1
     FLAG_LOAD_TRANSFORMER = True
 
@@ -91,6 +96,12 @@ import gc
 import time
 from pprint import pprint
 from functools import reduce
+
+#%% ===========================================================================
+#
+# =============================================================================
+# import coloredlogs
+# coloredlogs.install()
 
 #%% ===========================================================================
 # ML imports

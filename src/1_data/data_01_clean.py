@@ -98,8 +98,6 @@ logging.info("Category mappings for {} columns created".format(len(label_maps)))
 for map in label_maps:
     print(map, label_maps[map])
 
-
-
 #%% Dynamically create the transformation definitions
 # tx_definitions_preview = [(col_name, label_maps[col_name]) for col_name in label_maps]
 # for t in tx_definitions_preview:
