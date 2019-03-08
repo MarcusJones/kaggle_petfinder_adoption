@@ -29,7 +29,7 @@ logging.info("\tTest {}".format(df_te.shape))
 #%%
 logging.info("Splitting into X_ and y_".format())
 #%% Split Train
-target_col = 'AdoptionSpeed'
+
 y_tr = df_tr[target_col]
 X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
 
