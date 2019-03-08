@@ -7,7 +7,7 @@ encoder_list = list()
 
 columns = df_all.columns.tolist()
 
-columns.remove(target)
+columns.remove(target_col)
 
 for col in columns:
     if ptypes.is_categorical_dtype(df_all[col]):
@@ -55,6 +55,8 @@ data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
 #%%
 
 df_all = data_mapper.fit_transform(df_all.copy())
-df_all[target_col] = df_target
 logging.info("Encoded df_all".format())
-logging.info("Reverted targets to integers".format())
+
+logging.info("Re-applied the target column".format())
+df_all[target_col] = df_target
+
