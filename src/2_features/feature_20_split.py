@@ -44,18 +44,20 @@ X_te = df_te.drop(['AdoptionSpeed'], axis=1)
 
 #%%
 logging.info("X/y summary".format())
-logging.info("\tTraining X {}, y {}".format(X_tr.shape, y_tr.shape))
+
+
+logging.info("\t{:0.1%} Training X {}, y {}".format(len(X_tr)/len(df_all), X_tr.shape, y_tr.shape))
 if CV_FRACTION > 0:
-    logging.info("\tCross Validation X {}, y {}".format(X_cv.shape, y_cv.shape))
-logging.info("\tTest X {}".format(X_te.shape))
+    logging.info("\t{:0.1%} Cross Validation X {}, y {}".format(len(X_cv)/len(df_all), X_cv.shape, y_cv.shape))
+logging.info("\t{:0.1%} Test X {}".format(len(X_te)/len(df_all), X_te.shape))
 
 
 #%% DONE HERE - DELETE UNUSED
 
 del_vars =[
-    # 'df_all',
-    # 'df_tr',
-    # 'df_te',
+    'df_all',
+    'df_tr',
+    'df_te',
 ]
 cnt = 0
 for name in dir():
