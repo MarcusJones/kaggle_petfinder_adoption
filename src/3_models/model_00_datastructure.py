@@ -1,12 +1,14 @@
 
 class DataStructure:
     def __init__(self, df, target_column):
-        self.df = df
+        self.df = df.copy()
         self.target_column = target_column
+        self.dataset_type_column = 'dataset_type'
 
     def get_sub_df(self,dataset_type):
-        sub_df = self.df[self.df['dataset_type'] == dataset_type]
+        sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]
         assert not sub_df._is_view
+        sub_df.drop(dataset_type)
         return sub_df
 
     def sample_train(self, sample_frac):
@@ -71,9 +73,76 @@ class DataStructure:
         for cat, (label, count) in enumerate(ds.df[col_name].value_counts().iteritems()):
             logging.info("\t{:5} = {:30} {}".format(cat, label, count))
 
+    def build_encoder(self):
+        encoder_list = list()
 
-    def encode_numeric(self):
-        pass
+        columns = self.df.columns.tolist()
+
+        columns.remove(self.target_column)
+        columns.remove(self.dataset_type_column)
+
+        for col in columns:
+            if pd.api.types.is_categorical_dtype(self.df[col]):
+                encoder_list.append((col, sk.preprocessing.LabelEncoder()))
+
+            elif pd.api.types.is_string_dtype(self.df[col]):
+                # encoder_list.append((col,'STR?'))
+                continue
+
+            elif pd.api.types.is_bool_dtype(self.df[col]):
+                encoder_list.append((col, sk.preprocessing.LabelEncoder()))
+
+            elif pd.api.types.is_int64_dtype(self.df[col]):
+                encoder_list.append((col, None))
+
+            elif pd.api.types.is_float_dtype(self.df[col]):
+                encoder_list.append((col, None))
+
+            else:
+                pass
+
+        logging.info("Encoder list: {}".format(len(encoder_list)))
+        trf_cols = list()
+        for enc in encoder_list:
+            trf_cols.append(enc[0])
+
+        skipped_cols = set(self.df.columns) - set(trf_cols)
+        logging.info("Keep skipped columns unchanged: {}".format(skipped_cols))
+        for col in skipped_cols:
+            encoder_list.append((col, None))
+
+        # df_target = df_all[target_col].cat.codes
+
+        data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
+
+        return data_mapper
+
+    @property
+    def ready_to_split(self):
+        return False
+
+    # def target_cat_to_numeric(self):
+    #     self.df[self.target_column] = self.df[self.target_column].cat.codes
+
+    def apply_encoder(self, encoder, target_handler=None):
+
+        if not target_handler:
+            df_target = self.df[self.target_column].cat.codes
+            logging.info("Target will be mapped back to category numbers".format())
+
+        this_df = encoder.fit_transform(self.df.copy())
+        logging.info("Encoded df".format())
+
+        # Add target column
+        this_df[self.target_column] = df_target
+
+        # Add the dataset type column
+        logging.info("".format())
+        this_df[self.dataset_type_column] = self.df[self.dataset_type_column]
+
+        self.df = this_df
+
+
 
 #%%
 # Instantiate and summarize
@@ -84,7 +153,12 @@ ds.dtypes()
 #%%
 # Category counts
 # ds.all_category_counts()
-ds.category_counts(target_col)
+# ds.category_counts(target_col)
+
+#%% Sample
+df_all.columns
+ds.sample_train(0.8)
+
 
 #%%
 # Discard
@@ -96,17 +170,16 @@ cols_to_discard = [
     'Name',
 ]
 ds.discard_features(cols_to_discard)
+ds.dtypes()
 
-
-#%% Sample
-df_all.columns
-ds.sample_train(0.8)
-
+#%%
+# Encode numeric
+mapping_encoder = ds.build_encoder()
+ds.apply_encoder(mapping_encoder)
+ds.dtypes()
+#%%
+# Split
 X_tr, y_tr, X_te, y_te = ds.split_train_test()
-
-
-
-
 
 
 #%%
