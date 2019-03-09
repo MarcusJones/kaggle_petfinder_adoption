@@ -41,7 +41,6 @@ class DataStructure:
         logging.info("\tTarget column: {}".format(self.target_column))
         logging.info("\tTraining {}".format(self.get_sub_df('train').shape))
         logging.info("\tTest {}".format(self.get_sub_df('test').shape))
-        logging.info("".format())
 
     def dtypes(self):
         dtype_dict = defaultdict(lambda: 0)
@@ -61,16 +60,34 @@ class DataStructure:
         if len(discard_cols) > 0:
             logging.info("Discarded {} cols: {}".format(len(col_list), col_list))
 
+    def all_category_counts(self):
+        for col in self.df.columns:
+            if pd.api.types.is_categorical_dtype(self.df[col]):
+                self.category_counts(col)
+
+    def category_counts(self, col_name):
+        ds.df[col_name].cat.categories
+        logging.info("{} category counts".format(col_name))
+        for cat, (label, count) in enumerate(ds.df[col_name].value_counts().iteritems()):
+            logging.info("\t{:5} = {:30} {}".format(cat, label, count))
+
+
     def encode_numeric(self):
         pass
 
 #%%
 # Instantiate and summarize
-ds = DataStructure(df_all, 'AdoptionSpeed')
+ds = DataStructure(df_all, target_col)
 ds.train_test_summary()
 ds.dtypes()
 
 #%%
+# Category counts
+# ds.all_category_counts()
+ds.category_counts(target_col)
+
+#%%
+# Discard
 # Select feature columns
 logging.info("Feature selection".format())
 cols_to_discard = [

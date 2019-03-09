@@ -125,6 +125,7 @@ from collections import defaultdict
 import numpy as np
 print('numpy', np.__version__)
 import pandas as pd
+from pandas.api.types import ptypes
 print('pandas', pd.__version__)
 import sklearn as sk
 print('sklearn', sk.__version__)
