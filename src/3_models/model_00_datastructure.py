@@ -8,7 +8,7 @@ class DataStructure:
     def get_sub_df(self,dataset_type):
         sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]
         assert not sub_df._is_view
-        sub_df.drop(dataset_type)
+        # sub_df.drop(dataset_type)
         return sub_df
 
     def sample_train(self, sample_frac):
@@ -124,6 +124,13 @@ class DataStructure:
     # def target_cat_to_numeric(self):
     #     self.df[self.target_column] = self.df[self.target_column].cat.codes
 
+    def all_numeric(self):
+        # numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+        # newdf = df.select_dtypes(include=numerics)
+        for col in self.df:
+            assert pd.api.types.is_numeric_dtype(self.df[col]), "{} not numeric".format(col)
+
+
     def apply_encoder(self, encoder, target_handler=None):
 
         if not target_handler:
@@ -139,7 +146,6 @@ class DataStructure:
         # Add the dataset type column
         logging.info("".format())
         this_df[self.dataset_type_column] = self.df[self.dataset_type_column]
-
         self.df = this_df
 
 
@@ -149,6 +155,8 @@ class DataStructure:
 ds = DataStructure(df_all, target_col)
 ds.train_test_summary()
 ds.dtypes()
+
+pd.api.types.is_numeric_dtype(ds.df)
 
 #%%
 # Category counts
@@ -177,6 +185,10 @@ ds.dtypes()
 mapping_encoder = ds.build_encoder()
 ds.apply_encoder(mapping_encoder)
 ds.dtypes()
+ds.all_numeric()
+
+ds.df['Vaccinated']
+
 #%%
 # Split
 X_tr, y_tr, X_te, y_te = ds.split_train_test()
