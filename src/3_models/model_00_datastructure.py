@@ -184,9 +184,9 @@ ds.sample_train(0.8)
 # Select feature columns
 logging.info("Feature selection".format())
 cols_to_discard = [
-    # 'RescuerID',
+    'RescuerID',
     'Description',
-    # 'Name',
+    'Name',
 ]
 ds.discard_features(cols_to_discard)
 ds.dtypes()
