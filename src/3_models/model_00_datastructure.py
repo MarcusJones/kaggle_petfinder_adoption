@@ -4,6 +4,9 @@ class DataStructure:
         self.df = df.copy()
         self.target_column = target_column
         self.dataset_type_column = 'dataset_type'
+        self.feature_columns = set(self.df.columns) - set([self.target_column, self.dataset_type_column])
+
+        logging.info("Dataset with {} features, {} records".format(len(self.feature_columns), len(self.df)))
 
     def get_sub_df(self,dataset_type):
         sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]
@@ -41,8 +44,12 @@ class DataStructure:
     def train_test_summary(self):
         logging.info("DataFrame summary".format())
         logging.info("\tTarget column: {}".format(self.target_column))
-        logging.info("\tTraining {}".format(self.get_sub_df('train').shape))
-        logging.info("\tTest {}".format(self.get_sub_df('test').shape))
+        logging.info("\tDataset type column: {}".format(self.dataset_type_column))
+        len_all = len(self.df)
+        len_tr = len(self.get_sub_df('train'))
+        len_te = len(self.get_sub_df('test'))
+        logging.info("\tTraining {:<8} {:0.1%}".format(len_tr, len_tr/len_all))
+        logging.info("\t    Test {:<8} {:0.1%}".format(len_te, len_te/len_all))
 
     def dtypes(self):
         dtype_dict = defaultdict(lambda: 0)
@@ -161,7 +168,6 @@ ds = DataStructure(df_all, target_col)
 ds.train_test_summary()
 ds.dtypes()
 
-pd.api.types.is_numeric_dtype(ds.df)
 
 #%%
 # Category counts
@@ -178,9 +184,9 @@ ds.sample_train(0.8)
 # Select feature columns
 logging.info("Feature selection".format())
 cols_to_discard = [
-    'RescuerID',
+    # 'RescuerID',
     'Description',
-    'Name',
+    # 'Name',
 ]
 ds.discard_features(cols_to_discard)
 ds.dtypes()

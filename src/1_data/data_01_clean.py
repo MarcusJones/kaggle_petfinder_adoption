@@ -1,3 +1,9 @@
+#%%
+# Preprocess df_all
+# - Convert all to categorical using provided labels
+# DataFrameMapper is used
+# EXTRA handling since mapper loses categorical
+# EXTRA handling to ensure the target matches the original numerical labels
 
 #%%
 df_all['PhotoAmt'] = df_all['PhotoAmt'].astype('int')
