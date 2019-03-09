@@ -30,8 +30,8 @@ def cross_validate(_X_tr, _y_tr, model, metric_function, folds=10, repeats=5):
     for r in range(repeats):
         i=0
         logging.info("Cross Validating - Run {} of {}".format(str(r + 1), str(repeats)))
-        _X_tr, _y_tr = shuffle(_X_tr, _y_tr, random_state=r) #shuffle data before each repeat
-        kf = KFold(n_splits=folds, random_state=i+1000) #random split, different each time
+        _X_tr, _y_tr = sk.utils.shuffle(_X_tr, _y_tr, random_state=r)    #shuffle data before each repeat
+        kf = sk.model_selection.KFold(n_splits=folds, random_state=i+1000)         #random split, different each time
         for train_ind, cv_ind in kf.split(_X_tr):
             print('Fold', i+1, 'out of', folds)
             _X_tr_fold, _y_tr_fold = _X_tr[train_ind, :], _y_tr[train_ind]
@@ -47,4 +47,4 @@ def cross_validate(_X_tr, _y_tr, model, metric_function, folds=10, repeats=5):
 
 #%%
 
-cross_validate(X_tr, y_tr)
+cross_validate(X_tr, y_tr, clf, kappa)

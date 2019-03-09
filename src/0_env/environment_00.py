@@ -139,6 +139,7 @@ import sklearn.ensemble
 import sklearn.feature_extraction
 import sklearn.decomposition
 import sklearn.compose
+import sklearn.utils
 # import nltk
 # from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 # from nltk.corpus import stopwords
