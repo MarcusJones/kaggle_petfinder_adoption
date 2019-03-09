@@ -124,10 +124,13 @@ class DataStructure:
     # def target_cat_to_numeric(self):
     #     self.df[self.target_column] = self.df[self.target_column].cat.codes
 
-    def all_numeric(self):
+    def assert_all_numeric(self):
+        skip = [self.dataset_type_column, self.target_column]
         # numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
         # newdf = df.select_dtypes(include=numerics)
         for col in self.df:
+            if col in skip:
+                continue
             assert pd.api.types.is_numeric_dtype(self.df[col]), "{} not numeric".format(col)
 
 
@@ -147,6 +150,8 @@ class DataStructure:
         logging.info("".format())
         this_df[self.dataset_type_column] = self.df[self.dataset_type_column]
         self.df = this_df
+        self.assert_all_numeric()
+
 
 
 
@@ -185,113 +190,9 @@ ds.dtypes()
 mapping_encoder = ds.build_encoder()
 ds.apply_encoder(mapping_encoder)
 ds.dtypes()
-ds.all_numeric()
 
-ds.df['Vaccinated']
 
 #%%
 # Split
 X_tr, y_tr, X_te, y_te = ds.split_train_test()
 
-
-#%%
-
-
-df_te = df_all[df_all['dataset_type']=='test'].copy()
-df_te.drop('dataset_type', axis=1, inplace=True)
-logging.info("Split off test set {}, {:.1%} of the records".format(df_tr.shape,len(df_te)/len(df_all)))
-
-logging.info("DataFrame summary".format())
-logging.info("\tTraining {}".format(df_tr.shape))
-if CV_FRACTION > 0:
-    logging.info("\tCross Validation {}".format(df_cv.shape))
-logging.info("\tTest {}".format(df_te.shape))
-
-#%%
-logging.info("Splitting into X_ and y_".format())
-#%% Split Train
-
-y_tr = df_tr[target_col]
-X_tr = df_tr.drop(['AdoptionSpeed'], axis=1)
-
-#%% Split CV
-y_cv = df_cv[target_col]
-X_cv = df_cv.drop(['AdoptionSpeed'], axis=1)
-logging.info("Cross Validation X {}, y {}".format(X_cv.shape, y_cv.shape))
-
-#%% Split Test
-# Drop the target (it's NaN anyways)
-X_te = df_te.drop(['AdoptionSpeed'], axis=1)
-
-#%%
-logging.info("X/y summary".format())
-
-
-logging.info("\t{:0.1%} Training X {}, y {}".format(len(X_tr)/len(df_all), X_tr.shape, y_tr.shape))
-if CV_FRACTION > 0:
-    logging.info("\t{:0.1%} Cross Validation X {}, y {}".format(len(X_cv)/len(df_all), X_cv.shape, y_cv.shape))
-logging.info("\t{:0.
-
-#%%
-
-
-
-# TODO: NB that this SHUFFLES the dataframe!
-# df_all = df_all.sample(frac=SAMPLE_FRACTION)
-logging.info("Final size of data frame: {}".format(df_all.shape))
-logging.info("Size of df_all with selected features and records: {} MB".format(sys.getsizeof(df_all) / 1000 / 1000))
-
-import pandas.api.types as ptypes
-encoder_list = list()
-
-columns = df_all.columns.tolist()
-
-columns.remove(target_col)
-
-for col in columns:
-    if ptypes.is_categorical_dtype(df_all[col]):
-        encoder_list.append((col, sk.preprocessing.LabelEncoder()))
-
-    elif ptypes.is_string_dtype(df_all[col]):
-        # encoder_list.append((col,'STR?'))
-        continue
-
-    elif ptypes.is_bool_dtype(df_all[col]):
-        encoder_list.append((col, sk.preprocessing.LabelEncoder()))
-
-    elif ptypes.is_int64_dtype(df_all[col]):
-        encoder_list.append((col, None))
-
-    elif ptypes.is_float_dtype(df_all[col]):
-        encoder_list.append((col, None))
-
-    else:
-        pass
-        # print('Skip')
-
-logging.info("Encoder list: {}".format(len(encoder_list)))
-trf_cols = list()
-for enc in encoder_list:
-    trf_cols.append(enc[0])
-
-skipped_cols = set(df_all.columns) - set(trf_cols)
-logging.info("Keep skipped columns unchanged: {}".format(skipped_cols))
-for col in skipped_cols:
-    encoder_list.append((col, None))
-
-
-#%%
-# NB: The DataFrameMapper loses categorical features
-# Keep target variable aside!
-
-df_target = df_all[target_col].cat.codes
-
-data_mapper = DataFrameMapper(encoder_list, input_df=True, df_out=True)
-
-#%%
-
-df_all = data_mapper.fit_transform(df_all.copy())
-logging.info("Encoded df_all".format())
-
-logging.info("Re-applied the target column".format())
-df_all[target_col] = df_target
