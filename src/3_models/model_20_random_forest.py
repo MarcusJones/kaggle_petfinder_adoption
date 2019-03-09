@@ -2,8 +2,6 @@
 
 # assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
 
-
-
 #%% Model and params
 params_model = dict()
 # params['num_class'] = len(y_tr.value_counts())

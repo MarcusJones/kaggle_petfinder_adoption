@@ -1,4 +1,4 @@
-#%% Fit
+#%% Search
 if RUN_TYPE == "Grid Search":
     logging.info("Grid Search for {}".format(DEPLOYMENT))
     # For local training, run a gridsearch
@@ -16,6 +16,7 @@ if RUN_TYPE == "Grid Search":
 
     clf_grid_BEST = clf_grid.best_estimator_
 
+# Simple
 elif RUN_TYPE == 'Simple':
     logging.info("Simple run for {}".format(DEPLOYMENT))
 
