@@ -33,11 +33,11 @@ class DataStructure:
     def split_train_test(self):
         df_tr = self.get_sub_df('train')
         y_tr = df_tr[self.target_column]
-        X_tr = df_tr.drop([self.target_column], axis=1)
+        X_tr = df_tr.drop([self.target_column, self.dataset_type_column], axis=1)
 
         df_te = self.get_sub_df('train')
         y_te = df_te[self.target_column]
-        X_te = df_te.drop([self.target_column], axis=1)
+        X_te = df_te.drop([self.target_column, self.dataset_type_column], axis=1)
 
         return (X_tr, y_tr, X_te, y_te)
 
