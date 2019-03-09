@@ -1,7 +1,9 @@
 
-class ModelStructure:
-    def __init__(self, df):
+class DataStructure:
+    def __init__(self, df, target_column):
         self.df = df
+        self.target_column = target_column
+
 
     def get_sub_df(self,dataset_type):
         sub_df = self.df[self.df['dataset_type'] == dataset_type]
@@ -21,20 +23,50 @@ class ModelStructure:
         logging.info("Sampled training set from {} to {} rows, fraction={:0.1%}".format(original_col_cnt, len(df_tr), len(df_tr)/original_col_cnt))
 
     def split_cv(self, cv_frac):
-        df_tr, df_cv = sklearn.model_selection.train_test_split(df_tr, test_size=cv_frac)
+        df_tr, df_cv = sk.model_selection.train_test_split(df_tr, test_size=cv_frac)
         logging.info("Split off CV set, fraction={}".format(cv_frac))
 
+    def split_train_test(self):
+        df_tr = self.get_sub_df('train')
+        y_tr = df_tr[self.target_column]
+        X_tr = df_tr.drop([self.target_column], axis=1)
 
+        df_te = self.get_sub_df('train')
+        y_te = df_te[self.target_column]
+        X_te = df_te.drop([self.target_column], axis=1)
+
+        return (X_tr, y_tr, X_te, y_te)
+
+    def train_test_summary(self):
+        logging.info("DataFrame summary".format())
+        logging.info("\tTarget column: {}".format(self.target_column))
+        logging.info("\tTraining {}".format(self.get_sub_df('train').shape))
+        logging.info("\tTest {}".format(self.get_sub_df('test').shape))
+        logging.info("".format())
+
+    def dtypes(self):
+        dtype_dict = defaultdict(lambda: 0)
+        for col in self.df.columns:
+            dtype_dict[(str(self.df[col].dtype))] += 1
+        logging.info("DataFrame dtypes:".format())
+        for k in dtype_dict:
+            logging.info("\t{:>10} : {}".format(k, dtype_dict[k]))
+
+    def encode_numeric(self):
 
 #%%
-this_m = ModelStructure(df_all)
+
+this_m = DataStructure(df_all, 'AdoptionSpeed')
+this_m.train_test_summary()
+this_m.dtypes()
+str(df_all['AdoptionSpeed'].dtype)
+#%%
+df_all.columns
 this_m.sample_train(0.8)
 
+X_tr, y_tr, X_te, y_te = this_m.split_train_test()
 
 
-res = pd.concat([this_m.get_sub_df('train'),this_m.get_sub_df('test')])
-
-this_m.sample(0.8)
 
 
 

@@ -20,9 +20,6 @@ for col in columns:
     elif ptypes.is_bool_dtype(df_all[col]):
         encoder_list.append((col, sk.preprocessing.LabelEncoder()))
 
-    elif ptypes.is_bool_dtype(df_all[col]):
-        encoder_list.append((col, sk.preprocessing.LabelEncoder()))
-
     elif ptypes.is_int64_dtype(df_all[col]):
         encoder_list.append((col, None))
 

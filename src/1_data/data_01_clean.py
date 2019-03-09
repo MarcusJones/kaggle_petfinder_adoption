@@ -126,7 +126,7 @@ logging.info("Categorical transformer pipeline warnings, see docstring!".format(
 #%% FIT TRANSFORM
 df_all = data_mapper.fit_transform(df_all)
 logging.info("Size of train df_all with categorical columns: {} MB".format(sys.getsizeof(df_all)/1000/1000))
-logging.info("Warning: PipeLine returns strings, not categorical! ".format(sys.getsizeof(df_all)/1000/1000))
+logging.info("Warning: Pipeline returns strings, not categorical! ".format(sys.getsizeof(df_all)/1000/1000))
 
 #%% WARNING - sklearn-pandas has a flaw, it does not preserve categorical features!!!
 # ordered = ['AdoptionSpeed','MaturitySize','FurLength','Health'] #Actually, most have 'unspecified', which can't be ordered
