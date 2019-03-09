@@ -8,25 +8,32 @@ class ModelStructure:
         assert not sub_df._is_view
         return sub_df
 
-    def sample(self, sample_frac):
+    def sample_train(self, sample_frac):
         """Sample the training set to reduce size
 
         :return:
         """
         df_tr = self.get_sub_df('train')
+        original_col_cnt = len(df_tr)
+        df_te = self.get_sub_df('test')
         df_tr = df_tr.sample(frac=sample_frac)
-
-        logging.info("Sampled training set {}, fraction={}".format(df_tr.shape, sample_frac))
+        self.df = pd.concat([df_tr, df_te])
+        logging.info("Sampled training set from {} to {} rows, fraction={:0.1%}".format(original_col_cnt, len(df_tr), len(df_tr)/original_col_cnt))
 
     def split_cv(self, cv_frac):
-            df_tr, df_cv = sklearn.model_selection.train_test_split(df_tr, test_size=CV_FRACTION)
-            logging.info("Split off CV set, fraction={}".format(CV_FRACTION))
+        df_tr, df_cv = sklearn.model_selection.train_test_split(df_tr, test_size=cv_frac)
+        logging.info("Split off CV set, fraction={}".format(cv_frac))
 
 
 
 #%%
 this_m = ModelStructure(df_all)
-this_m.sample()
+this_m.sample_train(0.8)
+
+
+
+res = pd.concat([this_m.get_sub_df('train'),this_m.get_sub_df('test')])
+
 this_m.sample(0.8)
 
 
