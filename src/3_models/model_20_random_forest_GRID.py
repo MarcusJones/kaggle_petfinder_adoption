@@ -2,8 +2,6 @@
 
 # assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
 
-
-
 #%% Model and params
 params_model = dict()
 # params['num_class'] = len(y_tr.value_counts())
@@ -14,8 +12,8 @@ clf = sk.ensemble.RandomForestClassifier(**params_model )
 logging.info("Classifier created: {}".format(clf))
 
 #%% GridCV
-n_estimators_steps = 5
-max_depth_steps = 5
+n_estimators_steps = 4
+max_depth_steps = 4
 random_grid = {
     'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = n_estimators_steps)],
     'max_features' : ['auto', 'sqrt'],
@@ -32,7 +30,6 @@ logging.info("Grid set, size {}".format(grid_size))
 
 N_ITER = 400
 N_ITER = 200
-CV_FOLDS = 3
 CV_FOLDS = 3
 clf_grid = sk.model_selection.RandomizedSearchCV(estimator=clf, param_distributions=random_grid,
                                n_iter=N_ITER, cv=CV_FOLDS, verbose=50, random_state=42, n_jobs=-1)

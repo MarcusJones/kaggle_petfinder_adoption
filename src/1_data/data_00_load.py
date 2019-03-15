@@ -1,3 +1,6 @@
+#%%
+# Load data
+#
 
 #%% ===========================================================================
 # Data source and paths
@@ -29,6 +32,7 @@ states = pd.read_csv(path_data / "state_labels.csv")
 logging.info("Loaded train {}".format(df_train.shape))
 logging.info("Loaded test {}".format(df_test.shape))
 
+target_col = 'AdoptionSpeed'
 # Add a column to label the source of the data
 df_train['dataset_type'] = 'train'
 df_test['dataset_type'] = 'test'
