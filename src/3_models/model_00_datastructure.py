@@ -8,6 +8,24 @@ class DataStructure:
 
         logging.info("Dataset with {} features, {} records".format(len(self.feature_columns), len(self.df)))
 
+    # def feature_columns(self):
+    #     self.df.columns
+    #     return
+
+    def generate_variables(self):
+        vars = list()
+        for col in self.feature_columns:
+            vars.append(gamete_design_space.Variable.as_bool(col))
+        return vars
+
+
+    def generate_design_space(self):
+        vars = list()
+        for col in self.feature_columns:
+            vars.append(gamete_design_space.Variable.as_bool(col))
+        this_design_space = gamete_design_space.DesignSpace(vars)
+        return this_design_space
+
     def get_sub_df(self,dataset_type):
         sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]
         assert not sub_df._is_view
@@ -168,6 +186,9 @@ ds = DataStructure(df_all, target_col)
 ds.train_test_summary()
 ds.dtypes()
 
+#%%
+
+
 
 #%%
 # Category counts
@@ -200,5 +221,8 @@ ds.dtypes()
 
 #%%
 # Split
-X_tr, y_tr, X_te, y_te = ds.split_train_test()
+# X_tr, y_tr, X_te, y_te = ds.split_train_test()
 
+#%%
+
+# feature_design_space = ds.generate_design_space()

@@ -140,6 +140,10 @@ import sklearn.feature_extraction
 import sklearn.decomposition
 import sklearn.compose
 import sklearn.utils
+
+
+import gamete.design_space as gamete_design_space
+
 # import nltk
 # from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 # from nltk.corpus import stopwords
