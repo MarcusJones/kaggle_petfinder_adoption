@@ -1,1 +1,1 @@
-{"n_estimators": 800, "max_features": "sqrt", "max_depth": 800, "min_samples_split": 5, "min_samples_leaf": 4, "bootstrap": true}
+{"n_estimators": 200, "max_features": "sqrt", "max_depth": 800, "min_samples_split": 5, "min_samples_leaf": 2, "bootstrap": true}

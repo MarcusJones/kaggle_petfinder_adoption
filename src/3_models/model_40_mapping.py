@@ -1,4 +1,36 @@
-class RunController():
+class Individual:
+    def __init__(self, feature_chromo, model_chromo):
+        self.feature_chromo = feature_chromo
+        self.model_chromo = model_chromo
+
+    def save_genome(self):
+        self.save_feature_chromo()
+        self.save_model_chromo()
+
+    def save_feature_chromo(self):
+
+        feature_chromo_dict = {allele.name: allele.value for allele in self.feature_chromo }
+
+        IND_PATH = Path.cwd() / 'output'
+        assert IND_PATH.exists()
+        IND_OUT_FILE = IND_PATH / 'test_feature_chromosome.json'
+        with IND_OUT_FILE.open('w') as f:
+            json.dump(feature_chromo_dict, f)
+
+    def save_model_chromo(self):
+        feature_chromo_dict = {allele.name: allele.value for allele in self.model_chromo}
+
+        IND_PATH = Path.cwd() / 'output'
+        assert IND_PATH.exists()
+        IND_OUT_FILE = IND_PATH / 'test_model_chromosome.json'
+        with IND_OUT_FILE.open('w') as f:
+            json.dump(feature_chromo_dict, f)
+
+
+
+#%%
+
+class RunController:
     def __init__(self, datastruct, model_object):
         self.datastruct = datastruct
         self.model_object = model_object
@@ -23,6 +55,10 @@ class RunController():
         #
         # return this_ind
 
+    def get_random_individual(self):
+        feat_chromo = self.get_feature_chromosome()
+        model_chromo = self.get_model_chromosome()
+        return Individual(feat_chromo, model_chromo)
 
     def selection_dataframe(self):
         this_feature_selection = self.get_feature_chromosome()
@@ -62,24 +98,27 @@ this_var = feature_chromo[0]
 this_rc.get_model_chromosome()
 
 #%%
-feature_chromo = this_rc.get_feature_chromosome()
-feature_chromo_dict = {allele.name:allele.value for allele in feature_chromo}
-
-IND_PATH = Path.cwd() / 'output'
-assert IND_PATH.exists()
-IND_OUT_FILE = IND_PATH / 'test_feature_chromosome.json'
-with IND_OUT_FILE.open('w') as f:
-    json.dump(feature_chromo_dict, f)
-
+this_ind = this_rc.get_random_individual()
+this_ind.save_genome()
 #%%
-model_chromo = this_rc.get_model_chromosome()
-model_chromo_dict = {allele.name:allele.value for allele in model_chromo}
-
-IND_PATH = Path.cwd() / 'output'
-assert IND_PATH.exists()
-IND_OUT_FILE = IND_PATH / 'test_model_chromosome.json'
-with IND_OUT_FILE.open('w') as f:
-    json.dump(model_chromo_dict, f)
+# feature_chromo = this_rc.get_feature_chromosome()
+# feature_chromo_dict = {allele.name:allele.value for allele in feature_chromo}
+#
+# IND_PATH = Path.cwd() / 'output'
+# assert IND_PATH.exists()
+# IND_OUT_FILE = IND_PATH / 'test_feature_chromosome.json'
+# with IND_OUT_FILE.open('w') as f:
+#     json.dump(feature_chromo_dict, f)
+#
+# #%%
+# model_chromo = this_rc.get_model_chromosome()
+# model_chromo_dict = {allele.name:allele.value for allele in model_chromo}
+#
+# IND_PATH = Path.cwd() / 'output'
+# assert IND_PATH.exists()
+# IND_OUT_FILE = IND_PATH / 'test_model_chromosome.json'
+# with IND_OUT_FILE.open('w') as f:
+#     json.dump(model_chromo_dict, f)
 
 #%%
 sub_this_df = this_rc.selection_dataframe()
