@@ -87,6 +87,9 @@ class DataStructure:
         if len(discard_cols) > 0:
             logging.info("Discarded {} cols: {}".format(len(col_list), col_list))
 
+        for col in col_list:
+            self.feature_columns.remove(col)
+
     def all_category_counts(self):
         for col in self.df.columns:
             if pd.api.types.is_categorical_dtype(self.df[col]):
