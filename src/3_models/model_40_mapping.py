@@ -2,8 +2,9 @@ class Individual:
     def __init__(self, feature_chromo, model_chromo):
         self.feature_chromo = feature_chromo
         self.model_chromo = model_chromo
+        self.genotype = 1
 
-    def save_genome(self):
+    def save_genotype(self):
         self.save_feature_chromo()
         self.save_model_chromo()
 
@@ -98,8 +99,12 @@ this_var = feature_chromo[0]
 this_rc.get_model_chromosome()
 
 #%%
+
+this_ind.feature_chromo
+this_ind
+
 this_ind = this_rc.get_random_individual()
-this_ind.save_genome()
+this_ind.save_genotype()
 #%%
 # feature_chromo = this_rc.get_feature_chromosome()
 # feature_chromo_dict = {allele.name:allele.value for allele in feature_chromo}
