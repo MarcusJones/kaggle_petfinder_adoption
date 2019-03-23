@@ -35,6 +35,10 @@ run_definition['population_number'] = 0
 run_definition['id'] = this_genome.hash
 run_definition['path_data_root'] = PATH_DATA_ROOT
 run_definition['genome'] = this_genome.export_genome()
+run_definition['sample fraction'] = 0.5
+run_definition['random seed'] = 42
+run_definition['cv folds'] = 5
+
 
 type(run_definition['genome'])
 

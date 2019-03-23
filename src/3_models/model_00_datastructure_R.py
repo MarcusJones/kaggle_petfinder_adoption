@@ -1,0 +1,45 @@
+
+
+#%%
+# Instantiate and summarize
+ds = DataStructure(df_all, target_col)
+ds.train_test_summary()
+ds.dtypes()
+
+#%%
+# Category counts
+# ds.all_category_counts()
+# ds.category_counts(target_col)
+
+#%% Sample
+df_all.columns
+control_dict['sample_fraction']
+ds.sample_train(0.8)
+
+
+#%%
+# Discard
+# Select feature columns
+logging.info("Feature selection".format())
+cols_to_discard = [
+    'RescuerID',
+    'Description',
+    'Name',
+]
+ds.discard_features(cols_to_discard)
+ds.dtypes()
+
+#%%
+# Encode numeric
+mapping_encoder = ds.build_encoder()
+ds.apply_encoder(mapping_encoder)
+ds.dtypes()
+
+
+#%%
+# Split
+# X_tr, y_tr, X_te, y_te = ds.split_train_test()
+
+#%%
+
+# feature_design_space = ds.generate_design_space()
