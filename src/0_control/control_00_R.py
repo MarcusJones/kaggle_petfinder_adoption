@@ -3,7 +3,7 @@ import yaml
 THIS_RUN_FOLDER = "~/EXPERIMENT"
 THIS_GENERATION = '0'
 THIS_POP_NUMBER = '000'
-THIS_IND = '3164401158493596485'
+THIS_IND = '4675502409471162187'
 THIS_FILE_NAME = "control {}.json".format(THIS_IND)
 path_run = Path(THIS_RUN_FOLDER).expanduser() / THIS_GENERATION / "{}_{}".format(THIS_POP_NUMBER, THIS_IND)
 assert path_run.exists()
