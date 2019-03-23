@@ -12,19 +12,27 @@ class DataStructure:
     #     self.df.columns
     #     return
 
-    def generate_variables(self):
-        vars = list()
+    @property
+    def search_grid(self):
+        search_grid = list()
         for col in self.feature_columns:
-            vars.append(gamete_design_space.Variable.as_bool(col))
-        return vars
+            search_grid.append({'name': col, 'vtype': 'bool', 'variable_tuple':[True, False], 'ordered':False})
+        return search_grid
+
+    # def generate_variables(self):
+    #     vars = list()
+    #     for col in self.feature_columns:
+    #         vars.append(gamete_design_space.Variable.as_bool(col))
+    #     return vars
 
 
-    def generate_design_space(self):
-        vars = list()
-        for col in self.feature_columns:
-            vars.append(gamete_design_space.Variable.as_bool(col))
-        this_design_space = gamete_design_space.DesignSpace(vars)
-        return this_design_space
+    # def generate_design_space(self):
+    #     vars = list()
+    #     for col in self.feature_columns:
+    #
+    #         vars.append(gamete_design_space.Variable.as_bool(col))
+    #     this_design_space = gamete_design_space.DesignSpace(vars)
+    #     return this_design_space
 
     def get_dataset_type_df(self, dataset_type):
         sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]

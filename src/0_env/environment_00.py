@@ -144,7 +144,9 @@ import sklearn.compose
 import sklearn.utils
 
 
-import gamete.design_space as gamete_design_space
+import gamete.design_space
+import gamete.evolution_space
+
 
 # import nltk
 # from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer

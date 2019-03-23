@@ -28,14 +28,14 @@ hyper_param_search = [
 
 #%% Model space
 
-hyper_param_search = [
-    gamete_design_space.Variable('n_estimators', 'int', [int(x) for x in np.linspace(start=200, stop=2000, num=10)], True),
-    gamete_design_space.Variable('max_features', 'string', ['auto', 'sqrt'], False),
-    gamete_design_space.Variable('max_depth', 'int', [int(x) for x in np.linspace(start=200, stop=2000, num=10)], True),
-    gamete_design_space.Variable('min_samples_split', 'int', [2, 5, 10], True),
-    gamete_design_space.Variable('min_samples_leaf', 'int', [1, 2, 4], True),
-    gamete_design_space.Variable('bootstrap', 'bool', [True, ], False),
-]
+# hyper_param_search = [
+#     gamete_design_space.Variable('n_estimators', 'int', [int(x) for x in np.linspace(start=200, stop=2000, num=10)], True),
+#     gamete_design_space.Variable('max_features', 'string', ['auto', 'sqrt'], False),
+#     gamete_design_space.Variable('max_depth', 'int', [int(x) for x in np.linspace(start=200, stop=2000, num=10)], True),
+#     gamete_design_space.Variable('min_samples_split', 'int', [2, 5, 10], True),
+#     gamete_design_space.Variable('min_samples_leaf', 'int', [1, 2, 4], True),
+#     gamete_design_space.Variable('bootstrap', 'bool', [True, ], False),
+# ]
 
 #%%
 model_search = ModelSearch(clf, hyper_param_search)
