@@ -23,8 +23,9 @@ print(this_ds)
 
 this_ds.print_design_space()
 
-this_chromo = this_ds.gen_chromosome()
+genes = this_ds.gen_genes()
 
-this_ind = gamete.evolution_space.Genome(this_chromo)
-print(this_ind)
+this_genome = gamete.evolution_space.Genome(genes)
+print(this_genome)
+this_genome.print_genes()
 

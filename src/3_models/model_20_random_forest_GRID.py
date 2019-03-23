@@ -15,6 +15,7 @@ params_model = dict()
     })
 clf = sk.ensemble.RandomForestClassifier(**params_model )
 logging.info("Classifier created: {}".format(clf))
+
 #%%
 hyper_param_search = [
     {'name':'n_estimators', 'vtype':'int', 'variable_tuple':[int(x) for x in np.linspace(start=200, stop=2000, num=10)], 'ordered':True},
