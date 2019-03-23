@@ -28,4 +28,5 @@ genes = this_ds.gen_genes()
 this_genome = gamete.evolution_space.Genome(genes)
 print(this_genome)
 this_genome.print_genes()
+this_genome.export_genome()
 
