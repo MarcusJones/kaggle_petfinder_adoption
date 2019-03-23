@@ -7,29 +7,6 @@
 if FLAG_LOAD_TRANSFORMER:
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def timeit(method):
         """ Decorator to time execution of transformers
         :param method:

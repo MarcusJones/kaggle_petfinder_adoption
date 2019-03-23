@@ -1,4 +1,3 @@
-
 class DataStructure:
     def __init__(self, df, target_column, dataset_type_column='dataset_type'):
         self.df = df.copy()
@@ -8,31 +7,12 @@ class DataStructure:
 
         logging.info("Dataset with {} features, {} records".format(len(self.feature_columns), len(self.df)))
 
-    # def feature_columns(self):
-    #     self.df.columns
-    #     return
-
     @property
     def search_grid(self):
         search_grid = list()
         for col in self.feature_columns:
             search_grid.append({'name': col, 'vtype': 'bool', 'variable_tuple':[True, False], 'ordered':False})
         return search_grid
-
-    # def generate_variables(self):
-    #     vars = list()
-    #     for col in self.feature_columns:
-    #         vars.append(gamete_design_space.Variable.as_bool(col))
-    #     return vars
-
-
-    # def generate_design_space(self):
-    #     vars = list()
-    #     for col in self.feature_columns:
-    #
-    #         vars.append(gamete_design_space.Variable.as_bool(col))
-    #     this_design_space = gamete_design_space.DesignSpace(vars)
-    #     return this_design_space
 
     def get_dataset_type_df(self, dataset_type):
         sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]
@@ -53,10 +33,6 @@ class DataStructure:
         df_tr = df_tr.sample(frac=sample_frac)
         self.df = pd.concat([df_tr, df_te])
         logging.info("Sampled training set from {} to {} rows, fraction={:0.1%}".format(original_col_cnt, len(df_tr), len(df_tr)/original_col_cnt))
-
-    # def split_cv(self, cv_frac):
-    #     df_tr, df_cv = sk.model_selection.train_test_split(df_tr, test_size=cv_frac)
-    #     logging.info("Split off CV set, fraction={}".format(cv_frac))
 
     def split_train_test(self):
         df_tr = self.get_dataset_type_df('train')
@@ -193,49 +169,52 @@ class DataStructure:
 
 
 
-#%%
-# Instantiate and summarize
-ds = DataStructure(df_all, target_col)
-ds.train_test_summary()
-ds.dtypes()
+if 0:
+    #%%
+    @depcretiated
+    def cross_validate(_X_tr, _y_tr, model, metric_function, folds=10, repeats=5):
+        """
+        Function to do the cross validation - using stacked Out of Bag method instead of averaging across folds.
+        model = algorithm to validate. Must be scikit learn or scikit-learn like API (Example xgboost XGBRegressor)
+        x = training data, numpy array
+        y = training labels, numpy array
+        folds = K, the number of folds to divide the data into
+        repeats = Number of times to repeat validation process for more confidence
+        :param _X_tr:
+        :param _y_tr:
+        :param model: SKLearn API Model
+        :param metric_function: takes y, y_pred
+        :param folds:
+        :param repeats:
+        :return:
+        """
+        y_cv_fold_pred = np.zeros((len(_y_tr), repeats))
+        score = np.zeros(repeats)
+        _X_tr = np.array(_X_tr)
+        for r in range(repeats):
+            i=0
+            logging.info("Cross Validating - Run {} of {}".format(str(r + 1), str(repeats)))
+            _X_tr, _y_tr = sk.utils.shuffle(_X_tr, _y_tr, random_state=r)    #shuffle data before each repeat
+            kf = sk.model_selection.KFold(n_splits=folds, random_state=i+1000)         #random split, different each time
+            for train_ind, cv_ind in kf.split(_X_tr):
+                print('Fold', i+1, 'out of', folds)
+                _X_tr_fold, _y_tr_fold = _X_tr[train_ind, :], _y_tr[train_ind]
+                _X_cv_fold, _y_cv_fold = _X_tr[cv_ind, :], _y_tr[cv_ind]
+                model.fit(_X_tr_fold, _y_tr_fold)
+                y_cv_fold_pred[cv_ind, r] = model.predict(_X_cv_fold)
+                i+=1
+            score[r] = metric_function(y_cv_fold_pred[:,r], _y_tr)
 
-#%%
+        logging.info('\nCV complete, overall score: {}'.format(str(score)))
+        logging.info('Mean: {}'.format(str(np.mean(score))))
+        logging.info('Deviation: {}'.format(str(np.std(score))))
+
+    #%%
+    """
+    CV complete, overall score: [0.31460838 0.31986689 0.31859581 0.32246347 0.32236281]
+    2019-03-09 22:01:39 : Mean: 0.31957947269358394
+    2019-03-09 22:01:39 : Deviation: 0.002892279348388643
+    """
+    cross_validate(X_tr, y_tr, clf, kappa)
 
 
-
-#%%
-# Category counts
-# ds.all_category_counts()
-# ds.category_counts(target_col)
-
-#%% Sample
-df_all.columns
-ds.sample_train(0.8)
-
-
-#%%
-# Discard
-# Select feature columns
-logging.info("Feature selection".format())
-cols_to_discard = [
-    'RescuerID',
-    'Description',
-    'Name',
-]
-ds.discard_features(cols_to_discard)
-ds.dtypes()
-
-#%%
-# Encode numeric
-mapping_encoder = ds.build_encoder()
-ds.apply_encoder(mapping_encoder)
-ds.dtypes()
-
-
-#%%
-# Split
-# X_tr, y_tr, X_te, y_te = ds.split_train_test()
-
-#%%
-
-# feature_design_space = ds.generate_design_space()
