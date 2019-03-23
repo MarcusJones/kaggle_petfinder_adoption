@@ -74,6 +74,7 @@ logging.info("Deployment: {}".format(DEPLOYMENT))
 # Set the environment
 if DEPLOYMENT=='Kaggle':
     PATH_DATA_ROOT = Path.cwd() / '..' / 'input'
+    PATH_EXPERIMENT_ROOT = "~/EXPERIMENT"
     SAMPLE_FRACTION = 1
     CV_FRACTION = 0
     RUN_TYPE = "Simple"
@@ -82,6 +83,7 @@ if DEPLOYMENT=='Kaggle':
 
 elif DEPLOYMENT == 'Local':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
+    PATH_EXPERIMENT_ROOT = "~/EXPERIMENT"
     SAMPLE_FRACTION = 1
     CV_FRACTION = 0.2
     FLAG_LOAD_TRANSFORMER = True
@@ -89,6 +91,7 @@ elif DEPLOYMENT == 'Local':
 
 elif DEPLOYMENT == 'Local Kernel':
     PATH_DATA_ROOT = r"~/DATA/petfinder_adoption"
+    PATH_EXPERIMENT_ROOT = "~/EXPERIMENT"
     SAMPLE_FRACTION = 0.5
     CV_FRACTION = 0.2
     FLAG_LOAD_TRANSFORMER = True

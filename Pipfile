@@ -26,7 +26,8 @@ ipykernel = "*"
 ascii-graph = "*"
 jinja2 = "*"
 coloredlogs = "*"
-gamete = {editable = true,path = "/home/batman/git/py_gamete"}
+gamete = {path = "/home/batman/git/py_gamete",editable = true}
+pyyaml = "*"
 
 [requires]
 python_version = "3.6"
