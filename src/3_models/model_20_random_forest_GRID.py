@@ -15,6 +15,16 @@ params_model = dict()
     })
 clf = sk.ensemble.RandomForestClassifier(**params_model )
 logging.info("Classifier created: {}".format(clf))
+#%%
+hyper_param_search = [
+    {'name':'n_estimators', 'vtype':'int', 'variable_tuple':[int(x) for x in np.linspace(start=200, stop=2000, num=10)], 'ordered':True},
+    {'name':'max_features', 'vtype':'string', 'variable_tuple':['auto', 'sqrt'], 'ordered':False},
+    {'name':'max_depth', 'vtype':'int', 'variable_tuple':[int(x) for x in np.linspace(start=200, stop=2000, num=10)], 'ordered':True},
+    {'name':'min_samples_split', 'vtype':'int', 'variable_tuple':[2, 5, 10], 'ordered':True},
+    {'name':'min_samples_leaf', 'vtype':'int', 'variable_tuple':[1, 2, 4], 'ordered':True},
+    {'name':'bootstrap', 'vtype':'bool', 'variable_tuple':[True, ], 'ordered':False},
+]
+
 
 #%% Model space
 

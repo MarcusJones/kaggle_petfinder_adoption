@@ -1,9 +1,9 @@
 
 class DataStructure:
-    def __init__(self, df, target_column):
+    def __init__(self, df, target_column, dataset_type_column='dataset_type'):
         self.df = df.copy()
+        self.dataset_type_column = dataset_type_column
         self.target_column = target_column
-        self.dataset_type_column = 'dataset_type'
         self.feature_columns = set(self.df.columns) - set([self.target_column, self.dataset_type_column])
 
         logging.info("Dataset with {} features, {} records".format(len(self.feature_columns), len(self.df)))
@@ -26,7 +26,7 @@ class DataStructure:
         this_design_space = gamete_design_space.DesignSpace(vars)
         return this_design_space
 
-    def get_sub_df(self,dataset_type):
+    def get_dataset_type_df(self, dataset_type):
         sub_df = self.df[self.df[self.dataset_type_column] == dataset_type]
         assert not sub_df._is_view
         # sub_df.drop(dataset_type)
@@ -34,26 +34,28 @@ class DataStructure:
 
     def sample_train(self, sample_frac):
         """Sample the training set to reduce size
+        Do not sample the test records
 
         :return:
         """
-        df_tr = self.get_sub_df('train')
+        df_tr = self.get_dataset_type_df('train')
         original_col_cnt = len(df_tr)
-        df_te = self.get_sub_df('test')
+        # Set the test records aside
+        df_te = self.get_dataset_type_df('test')
         df_tr = df_tr.sample(frac=sample_frac)
         self.df = pd.concat([df_tr, df_te])
         logging.info("Sampled training set from {} to {} rows, fraction={:0.1%}".format(original_col_cnt, len(df_tr), len(df_tr)/original_col_cnt))
 
-    def split_cv(self, cv_frac):
-        df_tr, df_cv = sk.model_selection.train_test_split(df_tr, test_size=cv_frac)
-        logging.info("Split off CV set, fraction={}".format(cv_frac))
+    # def split_cv(self, cv_frac):
+    #     df_tr, df_cv = sk.model_selection.train_test_split(df_tr, test_size=cv_frac)
+    #     logging.info("Split off CV set, fraction={}".format(cv_frac))
 
     def split_train_test(self):
-        df_tr = self.get_sub_df('train')
+        df_tr = self.get_dataset_type_df('train')
         y_tr = df_tr[self.target_column]
         X_tr = df_tr.drop([self.target_column, self.dataset_type_column], axis=1)
 
-        df_te = self.get_sub_df('train')
+        df_te = self.get_dataset_type_df('train')
         y_te = df_te[self.target_column]
         X_te = df_te.drop([self.target_column, self.dataset_type_column], axis=1)
 
@@ -64,8 +66,8 @@ class DataStructure:
         logging.info("\tTarget column: {}".format(self.target_column))
         logging.info("\tDataset type column: {}".format(self.dataset_type_column))
         len_all = len(self.df)
-        len_tr = len(self.get_sub_df('train'))
-        len_te = len(self.get_sub_df('test'))
+        len_tr = len(self.get_dataset_type_df('train'))
+        len_te = len(self.get_dataset_type_df('test'))
         logging.info("\tTraining {:<8} {:0.1%}".format(len_tr, len_tr/len_all))
         logging.info("\t    Test {:<8} {:0.1%}".format(len_te, len_te/len_all))
 
