@@ -11,7 +11,7 @@
 # ]
 
 #%%
-model_search = ModelSearch(clf, hyper_param_search)
+
 
 
 #%% GridCV

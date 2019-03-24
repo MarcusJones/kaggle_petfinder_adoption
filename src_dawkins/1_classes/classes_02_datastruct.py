@@ -7,6 +7,9 @@ class DataStructure:
 
         logging.info("Dataset with {} features, {} records".format(len(self.feature_columns), len(self.df)))
 
+    def __str__(self):
+        return "DataStructure {} feature columns predicting {} with {} train/test records".format(len(self.feature_columns), self.target_column, len(self.df))
+
     @property
     def search_grid(self):
         search_grid = list()

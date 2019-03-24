@@ -26,3 +26,4 @@ hyper_param_search = [
     {'name':'bootstrap', 'vtype':'bool', 'variable_tuple':[True, ], 'ordered':False},
 ]
 
+model_search = ModelSearch(clf, hyper_param_search)

@@ -34,6 +34,9 @@ ds.dtypes()
 
 
 #%%
+print(ds)
+
+#%%
 # Split
 # X_tr, y_tr, X_te, y_te = ds.split_train_test()
 
