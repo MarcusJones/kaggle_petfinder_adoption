@@ -16,7 +16,6 @@ Created on Sun Jun 10 10:32:09 2018
 import sys
 import logging
 
-#Delete Jupyter notebook root logger handler
 logger = logging.getLogger()
 logger.handlers = []
 
@@ -24,12 +23,8 @@ logger.handlers = []
 logger.setLevel(logging.INFO)
 
 # Create formatter
-#FORMAT = "%(asctime)s - %(levelno)-3s - %(module)-10s  %(funcName)-10s: %(message)s"
-#FORMAT = "%(asctime)s - %(levelno)-3s - %(funcName)-10s: %(message)s"
-#FORMAT = "%(asctime)s - %(funcName)-10s: %(message)s"
 FORMAT = "%(asctime)s : %(message)s"
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
-#DATE_FMT = "%H:%M:%S"
 formatter = logging.Formatter(FORMAT, DATE_FMT)
 
 # Create handler and assign
@@ -43,7 +38,7 @@ logging.info("Logging started")
 #%%
 import os
 from pathlib import Path
-import importlib.util
+# import importlib.util
 
 # %% Globals
 #
@@ -61,13 +56,10 @@ if 0:
 # Detect the environment
 if 'KAGGLE_WORKING_DIR' in os.environ:
     DEPLOYMENT = 'Kaggle'
-
 elif 'LOCAL_KERNEL' in os.environ:
     DEPLOYMENT = 'Local Kernel'
-
 else:
     DEPLOYMENT = 'Local'
-
 
 logging.info("Deployment: {}".format(DEPLOYMENT))
 

@@ -1,8 +1,3 @@
-
-
-class DesignSpace:
-    pass
-
 X_tr = X_tr
 y_tr = y_tr
 X_te = X_te
