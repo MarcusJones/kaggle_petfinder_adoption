@@ -17,8 +17,12 @@ for pop_dir in generation_path.iterdir():
     individual_id = control_dict['id']
 
     logging.info("Gen {}, Individual {} {}".format(THIS_GENERATION, pop_number, individual_id))
-# THIS_FILE_NAME = "control {}.json".format(THIS_IND)
-# path_run = Path(THIS_RUN_FOLDER).expanduser() / THIS_GENERATION / "{}_{}".format(THIS_POP_NUMBER, THIS_IND)
-# assert path_run.exists()
-# path_run_file = path_run / THIS_FILE_NAME
-# assert path_run_file.exists()
+
+discard_cols = list()
+for allele in control_dict['genome']['feature set']:
+    if not allele['value']:
+        discard_cols.append(allele['name'])
+
+
+
+
