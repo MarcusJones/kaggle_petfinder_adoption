@@ -14,12 +14,6 @@ logging.info("Data path {}".format(PATH_DATA_ROOT))
 # =============================================================================
 logging.info(f"Loading files into memory")
 
-# def load_zip
-# with zipfile.ZipFile(path_data / "train.zip").open("train.csv") as f:
-#     df_train = pd.read_csv(f, delimiter=',')
-# with zipfile.ZipFile(path_data / "test.zip").open("test.csv") as f:
-#     df_test = pd.read_csv(f, delimiter=',')
-
 df_train = pd.read_csv(path_data / 'train'/ 'train.csv')
 df_train.set_index(['PetID'],inplace=True)
 df_test = pd.read_csv(path_data / 'test' / 'test.csv')
