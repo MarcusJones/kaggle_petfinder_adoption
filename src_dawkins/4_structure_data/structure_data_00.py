@@ -1,5 +1,3 @@
-
-
 #%%
 # Instantiate and summarize
 ds = DataStructure(df_all, target_col)
