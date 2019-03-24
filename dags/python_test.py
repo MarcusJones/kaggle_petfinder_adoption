@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Hardcode the path to the script modules
 from pathlib import Path
-SCRIPT_PATH = Path("~/kaggle/petfinder_adoption/src").expanduser()
+SCRIPT_PATH = Path("~/kaggle/petfinder_adoption/src_dawkins").expanduser()
 print(SCRIPT_PATH)
 import sys
 sys.path.insert(0, str(SCRIPT_PATH))

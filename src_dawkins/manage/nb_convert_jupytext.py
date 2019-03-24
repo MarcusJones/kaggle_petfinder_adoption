@@ -12,7 +12,7 @@ from pprint import pprint
 #%%
 # Get the IPython script root dir
 root_dir = Path.cwd()
-path_ipy_root=root_dir / "src"
+path_ipy_root=root_dir / "src_dawkins"
 path_kernel_script_out=root_dir / "kernel_submission" / "kernel.py"
 path_kernel_notebook_out=root_dir / "kernel_submission" / "kernel.ipynb"
 

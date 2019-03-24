@@ -9,15 +9,15 @@ logging.getLogger().setLevel(logging.info)
 # TEST_ZIP_OUT_DIR = Path('').cwd() / '..' / 'tempdel.bz2'
 
 #%% TEMPLATES
-PATH_TEMPLATE_HEAD = Path().cwd()/'src'/'manage'/'templates'/'head.py'
+PATH_TEMPLATE_HEAD = Path().cwd()/'src_dawkins'/'manage'/'templates'/'head.py'
 with PATH_TEMPLATE_HEAD.open() as fh:
     TEMPLATE_HEAD = Template(fh.read())
 
-PATH_TEMPLATE_PAYLOADS= Path().cwd()/'src'/'manage'/'templates'/'payloads.py'
+PATH_TEMPLATE_PAYLOADS= Path().cwd()/'src_dawkins'/'manage'/'templates'/'payloads.py'
 with PATH_TEMPLATE_PAYLOADS.open() as fh:
     TEMPLATE_PAYLOADS = Template(fh.read())
 
-PATH_TEMPLATE_BASE= Path().cwd()/'src'/'manage'/'templates'/'base.py'
+PATH_TEMPLATE_BASE= Path().cwd()/'src_dawkins'/'manage'/'templates'/'base.py'
 with PATH_TEMPLATE_BASE.open() as fh:
     TEMPLATE_BASE = Template(fh.read())
 
