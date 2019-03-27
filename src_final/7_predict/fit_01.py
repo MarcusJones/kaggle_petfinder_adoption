@@ -30,9 +30,24 @@ elif CONTROL_PARAMS['RUN_TYPE'] == 'SIMPLE':
 
 elif CONTROL_PARAMS['RUN_TYPE'] == 'KFOLDS':
     logging.info("Simple run for {}".format(CONTROL_PARAMS['DEPLOYMENT']))
-    # params = {'n_estimators': 400, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 20, 'bootstrap': True}
-    params = {'n_estimators': 400, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 110, 'bootstrap': True}
-    logging.info("Running fit with parameters: {}".format(params))
+
+    scorer = sk.metrics.make_scorer(kappa, greater_is_better=True, needs_proba=False, needs_threshold=False)
+
+    start = time.time()
+
+    r = sk.model_selection.cross_val_score(clf, X_tr, y_tr,
+                                           groups=None,
+                                           scoring=scorer,
+                                           cv=CONTROL_PARAMS['CV FOLDS'],
+                                           n_jobs=-1,
+                                           verbose=8,
+                                           fit_params=None,
+                                           pre_dispatch='2*n_jobs',
+                                           error_score='raise-deprecating')
+    logging.info("Ran CV selection, {:0.1f} minutes elapsed".format((time.time() - start)/60))
+
+    np.mean(r)
+    r.mean()
     clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
     clf_grid_BEST.fit(X_tr, y_tr)
 

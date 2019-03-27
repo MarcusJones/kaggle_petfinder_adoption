@@ -38,3 +38,7 @@ else:
 logging.info("Run type: {}".format(CONTROL_PARAMS['RUN_TYPE']))
 
 pprint.pprint(CONTROL_PARAMS)
+
+#%% Build the run parameters
+if CONTROL_PARAMS['RUN_TYPE']=='KFOLDS':
+    CONTROL_PARAMS['CV FOLDS'] = 5
