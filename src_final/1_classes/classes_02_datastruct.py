@@ -42,7 +42,7 @@ class DataStructure:
         y_tr = df_tr[self.target_column]
         X_tr = df_tr.drop([self.target_column, self.dataset_type_column], axis=1)
 
-        df_te = self.get_dataset_type_df('train')
+        df_te = self.get_dataset_type_df('test')
         y_te = df_te[self.target_column]
         X_te = df_te.drop([self.target_column, self.dataset_type_column], axis=1)
 
