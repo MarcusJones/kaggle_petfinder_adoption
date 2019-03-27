@@ -45,11 +45,11 @@ elif CONTROL_PARAMS['RUN_TYPE'] == 'KFOLDS':
                                            pre_dispatch='2*n_jobs',
                                            error_score='raise-deprecating')
     logging.info("Ran CV selection, {:0.1f} minutes elapsed".format((time.time() - start)/60))
+    logging.info("Mean of CV folds:".format(np.mean(r)))
+    logging.info("STD of CV folds:".format(np.std(r)))
 
-    np.mean(r)
-    r.mean()
-    clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
-    clf_grid_BEST.fit(X_tr, y_tr)
+    # clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
+    # clf_grid_BEST.fit(X_tr, y_tr)
 
 else:
     raise

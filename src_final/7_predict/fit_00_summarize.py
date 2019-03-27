@@ -1,4 +1,4 @@
-logging.info("Step 7: Fit and predict".format())
+logging.info(" *** Step 7: Fit and predict ***".format())
 
 CONTROL_PARAMS['START_FIT_TIME'] =datetime.datetime.now()
 

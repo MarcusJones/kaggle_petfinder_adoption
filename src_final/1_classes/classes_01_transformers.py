@@ -1,4 +1,4 @@
-logging.info("Step 1: Classes".format())
+logging.info(" *** Step 1: Classes ***".format())
 #%%
 # This is to work around kaggle kernel's not allowing external modules
 # For local deployment, this is skipped.

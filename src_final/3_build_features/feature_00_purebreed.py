@@ -1,4 +1,4 @@
-logging.info("Step 3: Build features".format())
+logging.info(" *** Step 3: Build features *** ".format())
 
 # %% ===========================================================================
 # Feature - Pure Breed Boolean column

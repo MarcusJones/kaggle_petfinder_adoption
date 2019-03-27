@@ -1,4 +1,4 @@
-logging.info("Step 2: Load data".format())
+logging.info(" *** Step 2: Load data *** ".format())
 #%%
 # Load data
 #

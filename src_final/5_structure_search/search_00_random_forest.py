@@ -1,4 +1,4 @@
-logging.info("Step 5: (Structure search)".format())
+logging.info(" *** Step 5: (Structure search) ***".format())
 # Train 2 seperate models, one for cats, one for dogs!!
 
 # assert y_tr.dtype == np.dtype('int64'), "y_tr must be integer for LGBM!!"
