@@ -1,3 +1,4 @@
+logging.info("Step 4: Structure data".format())
 #%%
 # Instantiate and summarize
 ds = DataStructure(df_all, target_col)

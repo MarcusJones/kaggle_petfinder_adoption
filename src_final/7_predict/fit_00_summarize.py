@@ -1,11 +1,13 @@
+logging.info("Step 7: Fit and predict".format())
+
 CONTROL_PARAMS['START_FIT_TIME'] =datetime.datetime.now()
 
 logging.info("--- Control parameter summary ---".format())
 for k in CONTROL_PARAMS:
     logging.info("{}={}".format(k, CONTROL_PARAMS[k]))
 
+#%% Sample and split
 logging.info("--- Split data summary ---".format())
-#%% Sample
 df_all.columns
 # ds.sample_train(0.8)
 
