@@ -23,10 +23,11 @@ elif CONTROL_PARAMS['RUN_TYPE'] == 'SIMPLE':
 
     logging.info("Simple run for {}".format(CONTROL_PARAMS['DEPLOYMENT']))
     # params = {'n_estimators': 400, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 20, 'bootstrap': True}
-    params = {'n_estimators': 400, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 110, 'bootstrap': True}
+    # params = {'n_estimators': 400, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 110, 'bootstrap': True}
     logging.info("Running fit with parameters: {}".format(params))
-    clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
-    clf_grid_BEST.fit(X_tr, y_tr)
+    # clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
+    clf.fit(X_tr, y_tr)
+
 
 elif CONTROL_PARAMS['RUN_TYPE'] == 'KFOLDS':
     logging.info("Simple run for {}".format(CONTROL_PARAMS['DEPLOYMENT']))

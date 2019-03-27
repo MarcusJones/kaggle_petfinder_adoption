@@ -5,7 +5,7 @@
 # assert all(y_tr == original_y_train)
 
 # %% Predict on X_tr for comparison
-y_tr_predicted = clf_grid_BEST.predict(X_tr)
+y_tr_predicted = clf.predict(X_tr)
 
 # original_y_train.value_counts()
 # y_tr.cat.codes.value_counts()
@@ -21,7 +21,7 @@ sk.metrics.confusion_matrix(y_tr, y_tr_predicted)
 
 #%% Predict on X_cv for cross validation
 if CV_FRACTION > 0:
-    y_cv_predicted = clf_grid_BEST.predict(X_cv)
+    y_cv_predicted = clf.predict(X_cv)
     train_kappa_cv = kappa(y_cv, y_cv_predicted)
     logging.info("Metric on Cross Validation set: {:0.3f}".format(train_kappa_cv))
     sk.metrics.confusion_matrix(y_cv, y_cv_predicted)
@@ -29,7 +29,7 @@ if CV_FRACTION > 0:
 #%% Predict on Test set
 # NB we only want the defaulters column!
 logging.info("Predicting on X_te".format())
-predicted = clf_grid_BEST.predict(X_te)
+predicted = clf.predict(X_te)
 
 # raise "Lost the sorting of y!"
 #%% Open the submission
