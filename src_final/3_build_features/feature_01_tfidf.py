@@ -1,5 +1,5 @@
 df_all['Description'].fillna('none',inplace=True)
-logging.info("Filled 'none' in Description".format())
+logging.info("Filled na with 'none' in Description".format())
 
 #%%
 df_all_cp = df_all.copy()

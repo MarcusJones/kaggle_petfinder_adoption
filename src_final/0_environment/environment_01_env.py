@@ -35,10 +35,18 @@ elif CONTROL_PARAMS['DEPLOYMENT']  == 'KERNEL_TEST':
 # Detect/set the run type
 if CONTROL_PARAMS['DEPLOYMENT'] =='KAGGLE':
     CONTROL_PARAMS['RUN_TYPE']='SIMPLE'
+
 elif CONTROL_PARAMS['DEPLOYMENT'] in ['LOCAL', 'KERNEL_TEST']:
-    # CONTROL_PARAMS['RUN_TYPE']='SIMPLE'
-    CONTROL_PARAMS['RUN_TYPE']='KFOLDS'
+
+    # Run a grid search, or a straight up training?
+    CONTROL_PARAMS['RUN_TYPE']='SIMPLE'
     # CONTROL_PARAMS['RUN_TYPE']=='SEARCH'
+
+    # Run a CV score?
+    CONTROL_PARAMS['CV SCORE']=True
+    CONTROL_PARAMS['CV FOLDS']=5
+    # CONTROL_PARAMS['CV SCORE']=False
+
 else:
     raise
 

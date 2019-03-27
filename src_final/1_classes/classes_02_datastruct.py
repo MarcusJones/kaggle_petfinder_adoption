@@ -45,7 +45,7 @@ class DataStructure:
         df_te = self.get_dataset_type_df('test')
         y_te = df_te[self.target_column]
         X_te = df_te.drop([self.target_column, self.dataset_type_column], axis=1)
-
+        logging.info("Split X_tr, y_tr, X_te, y_te".format())
         return (X_tr, y_tr, X_te, y_te)
 
     def train_test_summary(self):
