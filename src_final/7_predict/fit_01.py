@@ -15,8 +15,10 @@ if 'CV SCORE' in CONTROL_PARAMS:
                                            pre_dispatch='2*n_jobs',
                                            error_score='raise-deprecating')
     logging.info("Ran CV selection, {:0.1f} minutes elapsed".format((time.time() - start)/60))
-    logging.info("Mean of CV folds:".format(np.mean(r)))
-    logging.info("STD of CV folds:".format(np.std(r)))
+    logging.info("Mean of CV folds:{:0.3f}".format(np.mean(r)))
+    logging.info("STD of CV folds:{:0.3f}".format(np.std(r)))
+    logging.info("Mean {:0.5f} +/- {:0.1%}".format(np.mean(r), np.std(r)/np.mean(r)))
+
 
 #%% Search
 if CONTROL_PARAMS['RUN_TYPE'] == "SEARCH":
@@ -44,12 +46,15 @@ elif CONTROL_PARAMS['RUN_TYPE'] == 'SIMPLE':
     # params = {'n_estimators': 400, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 110, 'bootstrap': True}
     logging.info("Running fit with parameters: {}".format(params))
     # clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
+    start = time.time()
     clf.fit(X_tr, y_tr)
+    logging.info("Fit finished, {:0.1f}m elapsed".format((time.time() - start)/60))
 
 else:
     raise
 
 #%%
+assert 0 < len( [k for k,v in inspect.getmembers(clf) if k.endswith('_') and not k.startswith('__')] ), "Classifier is not fitted"
 logging.info("Fit finished. ".format())
 
 #%%

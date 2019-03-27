@@ -20,11 +20,11 @@ sk.metrics.confusion_matrix(y_tr, y_tr_predicted)
 
 
 #%% Predict on X_cv for cross validation
-if CV_FRACTION > 0:
-    y_cv_predicted = clf.predict(X_cv)
-    train_kappa_cv = kappa(y_cv, y_cv_predicted)
-    logging.info("Metric on Cross Validation set: {:0.3f}".format(train_kappa_cv))
-    sk.metrics.confusion_matrix(y_cv, y_cv_predicted)
+# if CV_FRACTION > 0:
+#     y_cv_predicted = clf.predict(X_cv)
+#     train_kappa_cv = kappa(y_cv, y_cv_predicted)
+#     logging.info("Metric on Cross Validation set: {:0.3f}".format(train_kappa_cv))
+#     sk.metrics.confusion_matrix(y_cv, y_cv_predicted)
 
 #%% Predict on Test set
 # NB we only want the defaulters column!
