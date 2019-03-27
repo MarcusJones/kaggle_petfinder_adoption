@@ -35,7 +35,7 @@ handler = logging.StreamHandler(sys.stderr)
 handler.setFormatter(formatter)
 logger.handlers = [handler]
 
-CONTROL_PARAMS['START_TIME'] =datetime.datetime.now()
+CONTROL_PARAMS['START_TIME'] = datetime.datetime.now()
 logging.info("Logging started")
 
 logging.info("Kernel started {}".format(CONTROL_PARAMS['START_TIME']))

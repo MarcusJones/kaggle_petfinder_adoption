@@ -6,9 +6,8 @@
 if CONTROL_PARAMS['RUN_TYPE']=='SEARCH':
     #%% Model and params
     params_model = dict()
-        # params['num_class'] = len(y_tr.value_counts())
-        params_model.update({
-        })
+    # params['num_class'] = len(y_tr.value_counts())
+    params_model.update({ })
     clf = sk.ensemble.RandomForestClassifier(**params_model )
     logging.info("Classifier created: {}".format(clf))
 
