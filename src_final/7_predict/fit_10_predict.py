@@ -32,6 +32,14 @@ logging.info("Predicting on X_te".format())
 predicted = clf.predict(X_te)
 
 # raise "Lost the sorting of y!"
+
+
+logging.info("--- Fit summary ---".format())
+if 'CV SCORE' in CONTROL_PARAMS:
+    logging.info("CV Score: {:0.5f}".format(RESULTS['CV Score']))
+    logging.info("CV standard deviation: {:0.5f}".format(RESULTS['CV standard deviation']))
+
+
 #%% Open the submission
 # with zipfile.ZipFile(path_data / "test.zip").open("sample_submission.csv") as f:
 #     df_submission = pd.read_csv(f, delimiter=',')
@@ -48,3 +56,7 @@ logging.info("Saving submission to csv.".format())
 df_submission.to_csv('submission.csv', index=False)
 
 CONTROL_PARAMS['KERNEL_END_TIME'] =datetime.datetime.now()
+
+CONTROL_PARAMS['KERNEL_ELAPSED_TIME'] = CONTROL_PARAMS['KERNEL_START_TIME'] - CONTROL_PARAMS['KERNEL_END_TIME']
+
+logging.info("All done, {} elapsed".format(CONTROL_PARAMS['KERNEL_ELAPSED_TIME']/60))

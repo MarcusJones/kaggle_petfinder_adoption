@@ -1,3 +1,7 @@
+#%%
+RESULTS = dict()
+#%%
+
 if 'CV SCORE' in CONTROL_PARAMS:
     logging.info("Calculating CV score for the classifier".format())
 
@@ -18,6 +22,9 @@ if 'CV SCORE' in CONTROL_PARAMS:
     logging.info("Mean of CV folds:{:0.3f}".format(np.mean(r)))
     logging.info("STD of CV folds:{:0.3f}".format(np.std(r)))
     logging.info("Mean {:0.5f} +/- {:0.1%}".format(np.mean(r), np.std(r)/np.mean(r)))
+
+    RESULTS['CV Score'] = np.mean(r)
+    RESULTS['CV standard deviation'] = np.std(r)
 
 
 #%% Search
