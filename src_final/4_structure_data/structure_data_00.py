@@ -9,10 +9,6 @@ ds.dtypes()
 # ds.all_category_counts()
 # ds.category_counts(target_col)
 
-#%% Sample
-df_all.columns
-# ds.sample_train(0.8)
-
 #%%
 # Discard
 # Select feature columns
@@ -34,10 +30,6 @@ ds.dtypes()
 
 #%%
 logging.info("Data Structure created: {}".format(ds))
-
-#%%
-# Split
-# X_tr, y_tr, X_te, y_te = ds.split_train_test()
 
 #%%
 

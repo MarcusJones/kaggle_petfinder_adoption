@@ -1,10 +1,6 @@
 import os
 # Set the environment
 
-
-
-
-
 #%%
 # Detect the deployment
 if 'KAGGLE_WORKING_DIR' in os.environ:
@@ -33,7 +29,8 @@ elif CONTROL_PARAMS['DEPLOYMENT']  == 'LOCAL':
 if CONTROL_PARAMS['DEPLOYMENT'] =='KAGGLE':
     CONTROL_PARAMS['RUN_TYPE']='SIMPLE'
 elif CONTROL_PARAMS['DEPLOYMENT']=='LOCAL':
-    CONTROL_PARAMS['RUN_TYPE']='SIMPLE'
+    # CONTROL_PARAMS['RUN_TYPE']='SIMPLE'
+    CONTROL_PARAMS['RUN_TYPE']='KFOLDS'
     # CONTROL_PARAMS['RUN_TYPE']=='SEARCH'
 else:
     raise

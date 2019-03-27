@@ -28,18 +28,28 @@ elif CONTROL_PARAMS['RUN_TYPE'] == 'SIMPLE':
     clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
     clf_grid_BEST.fit(X_tr, y_tr)
 
+elif CONTROL_PARAMS['RUN_TYPE'] == 'KFOLDS':
+    logging.info("Simple run for {}".format(CONTROL_PARAMS['DEPLOYMENT']))
+    # params = {'n_estimators': 400, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 20, 'bootstrap': True}
+    params = {'n_estimators': 400, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_features': 'auto', 'max_depth': 110, 'bootstrap': True}
+    logging.info("Running fit with parameters: {}".format(params))
+    clf_grid_BEST = sk.ensemble.RandomForestClassifier(**params)
+    clf_grid_BEST.fit(X_tr, y_tr)
+
 else:
     raise
 
 #%%
 logging.info("Fit finished. ".format())
 
-features = X_tr.columns
-importances = clf_grid_BEST.feature_importances_
-indices = np.argsort(importances)
-if DEPLOYMENT != 'Kaggle' and 0:
-    plt.title('Feature Importances')
-    plt.barh(range(len(indices)), importances[indices], color='b', align='center')
-    plt.yticks(range(len(indices)), [features[i] for i in indices])
-    plt.xlabel('Relative Importance')
-    plt.show()
+#%%
+if 0:
+    features = X_tr.columns
+    importances = clf_grid_BEST.feature_importances_
+    indices = np.argsort(importances)
+    if DEPLOYMENT != 'Kaggle' and 0:
+        plt.title('Feature Importances')
+        plt.barh(range(len(indices)), importances[indices], color='b', align='center')
+        plt.yticks(range(len(indices)), [features[i] for i in indices])
+        plt.xlabel('Relative Importance')
+        plt.show()
