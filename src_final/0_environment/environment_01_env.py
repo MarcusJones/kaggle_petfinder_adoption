@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 # Set the environment
 
 #%%
@@ -22,12 +23,14 @@ if CONTROL_PARAMS['DEPLOYMENT'] =='KAGGLE':
     CONTROL_PARAMS['CV_FRACTION'] = 0
 
 elif CONTROL_PARAMS['DEPLOYMENT']  == 'LOCAL':
-    CONTROL_PARAMS['PATH_DATA_ROOT'] = r"~/DATA/petfinder_adoption"
+    CONTROL_PARAMS['PATH_DATA_ROOT'] = Path.cwd() / 'input' / 'petfinder-adoption-prediction'
+    # CONTROL_PARAMS['PATH_DATA_ROOT'] = r"~/DATA/petfinder_adoption"
     CONTROL_PARAMS['SAMPLE_FRACTION'] = 1
     CONTROL_PARAMS['CV_FRACTION'] = 0.2
 
 elif CONTROL_PARAMS['DEPLOYMENT']  == 'KERNEL_TEST':
-    CONTROL_PARAMS['PATH_DATA_ROOT'] = r"~/DATA/petfinder_adoption"
+    CONTROL_PARAMS['PATH_DATA_ROOT'] = Path.cwd() / 'input' / 'petfinder-adoption-prediction'
+    # CONTROL_PARAMS['PATH_DATA_ROOT'] = r"~/DATA/petfinder_adoption"
     CONTROL_PARAMS['SAMPLE_FRACTION'] = 0.5
     CONTROL_PARAMS['CV_FRACTION'] = 0.2
 
