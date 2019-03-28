@@ -45,7 +45,8 @@ np.random.seed(seed=1337)
 warnings.filterwarnings('ignore')
 
 split_char = '/'
-# import keras
+import tensorflow
+import keras
 # from keras import backend as K
 # K.tensorflow_backend._get_available_gpus()
 
