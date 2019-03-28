@@ -42,9 +42,14 @@ import sklearn.decomposition
 import sklearn.compose
 import sklearn.utils
 
-import gamete.design_space
-import gamete.evolution_space
+# Evolutionary search
+# import gamete.design_space
+# import gamete.evolution_space
 
+# Keras
+from keras.models import Model
+from keras.layers import GlobalAveragePooling2D, Input, Lambda, AveragePooling1D
+import keras.backend as K
 
 # import nltk
 # from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer

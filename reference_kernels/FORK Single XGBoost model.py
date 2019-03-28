@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pprint
 import warnings
-
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
@@ -45,9 +45,13 @@ np.random.seed(seed=1337)
 warnings.filterwarnings('ignore')
 
 split_char = '/'
+# import keras
+# from keras import backend as K
+# K.tensorflow_backend._get_available_gpus()
 
 # %% {"_cell_guid": "79c7e3d0-c299-4dcb-8224-4455121ee9b0", "_uuid": "d629ff2d2480ee46fbb7e2d37f6b5fab8052498a"}
-os.listdir('../input')
+os.chdir('./reference_kernels')
+os.listdir(Path().cwd() / '../input')
 
 # %% {"_uuid": "24a6811e5b612c3d2aef6639f577dd10f2564be4"}
 train = pd.read_csv('../input/petfinder-adoption-prediction/train/train.csv')
@@ -865,6 +869,11 @@ xgb_params = {
     'device': 'gpu',
     'silent': 1,
 }
+
+
+
+
+
 
 
 # %% {"_uuid": "6ce6060ef879fd0d9a8a483b593b195926e6ef7f"}

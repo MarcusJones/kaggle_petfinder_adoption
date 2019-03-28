@@ -30,6 +30,9 @@ gamete = {path = "/home/batman/git/py_gamete",editable = true}
 pyyaml = "*"
 deprecated = "*"
 keras = "==2.2.4"
+joblib = "*"
+opencv-python = "*"
+tensorflow = "==1.13.1"
 
 [requires]
 python_version = "3.6"
