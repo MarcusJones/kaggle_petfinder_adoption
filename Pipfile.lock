@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "109993e32b4e5ed0596e479145c4e8c426077e595a9099fa4fb9bf17f2fac683"
+            "sha256": "081286d931de6dc90908ea234737d0967f5192e3a054c394cc81434b6ecc51dd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -90,6 +90,14 @@
                 "sha256:f069f3a01830ca754ba5258fde2278454a0b5b79e0d7f5c13b3b97e57d4acff6"
             ],
             "version": "==4.4.0"
+        },
+        "deprecated": {
+            "hashes": [
+                "sha256:2f293eb0eee34b1fcf3da530fe8fc4b0d71d43ddc2dc78e2ffb444b6c0868557",
+                "sha256:749f6cdcfbdc3f79258f8154bad43fced95adc632c337675d0385959895894bc"
+            ],
+            "index": "pypi",
+            "version": "==1.2.5"
         },
         "eli5": {
             "hashes": [
@@ -194,10 +202,10 @@
         },
         "jupytext": {
             "hashes": [
-                "sha256:4075e0ac1a2ae17f43129fcc344fe4697aeeaf13ede88205c72fbab5ff1fe061"
+                "sha256:81dd92303fe87dc7246222bf7ac86b2a9861d7e93c7b2c4303bac1ac094698e5"
             ],
             "index": "pypi",
-            "version": "==1.0.4"
+            "version": "==1.0.5"
         },
         "kiwisolver": {
             "hashes": [
@@ -744,6 +752,12 @@
             ],
             "index": "pypi",
             "version": "==1.5.0"
+        },
+        "wrapt": {
+            "hashes": [
+                "sha256:4aea003270831cceb8a90ff27c4031da6ead7ec1886023b80ce0dfe0adf61533"
+            ],
+            "version": "==1.11.1"
         },
         "xgboost": {
             "hashes": [

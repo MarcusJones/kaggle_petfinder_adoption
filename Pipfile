@@ -28,6 +28,7 @@ jinja2 = "*"
 coloredlogs = "*"
 gamete = {path = "/home/batman/git/py_gamete",editable = true}
 pyyaml = "*"
+deprecated = "*"
 
 [requires]
 python_version = "3.6"
