@@ -57,6 +57,6 @@ df_submission.to_csv('submission.csv', index=False)
 
 CONTROL_PARAMS['KERNEL_END_TIME'] =datetime.datetime.now()
 
-CONTROL_PARAMS['KERNEL_ELAPSED_TIME'] = CONTROL_PARAMS['KERNEL_START_TIME'] - CONTROL_PARAMS['KERNEL_END_TIME']
+CONTROL_PARAMS['TOTAL_ELAPSED_TIME'] = CONTROL_PARAMS['START_TIME'] - CONTROL_PARAMS['KERNEL_END_TIME']
 
-logging.info("All done, {} elapsed".format(CONTROL_PARAMS['KERNEL_ELAPSED_TIME']/60))
+logging.info("All done, {} elapsed".format(CONTROL_PARAMS['TOTAL_ELAPSED_TIME']/60))
