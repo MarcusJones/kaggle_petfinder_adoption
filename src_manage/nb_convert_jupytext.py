@@ -12,7 +12,7 @@ from pprint import pprint
 #%%
 # Get the IPython script root dir
 root_dir = Path.cwd()
-path_ipy_root=root_dir / "src_dawkins"
+path_ipy_root=root_dir / "src_final"
 path_kernel_script_out=root_dir / "kernel_submission" / "kernel.py"
 path_kernel_notebook_out=root_dir / "kernel_submission" / "kernel.ipynb"
 
@@ -22,7 +22,7 @@ for folder in [f for f in path_ipy_root.glob('./*/') if f.is_dir() == True]:
     folder_number = folder.parts[-1].split('_')[0]
     if not folder_number.isdigit():
         continue
-    print(folder)
+    # print(folder)
     script_folders.append(folder)
 script_folders.sort()
 
@@ -56,9 +56,6 @@ for k in kernel_files:
 
 #%%
 script_lines = list()
-
-
-
 #
 # script_lines = script_lines + clean_lines
 # logging.info("Appended path_transformers {} lines".format(len(clean_lines)))
@@ -79,7 +76,8 @@ logging.info("Wrote {}".format(path_kernel_script_out))
 
 #%% Convert to notebook
 # Parse the script to Jupyter format
-parsed = jupytext.reads("".join(script_lines), ext='.py', format_name='percent')
+# parsed = jupytext.reads("".join(script_lines), ext='.py', format_name='percent')
+parsed = jupytext.reads("".join(script_lines), fmt='.py')
 
 # Delete the file if it exists
 # if out_path.exists():
